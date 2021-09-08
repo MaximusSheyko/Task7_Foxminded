@@ -1,12 +1,9 @@
 package com.foxminded.Task7_SQL.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.ListIterator;
 import java.util.Random;
 
 import com.foxminded.Task7_SQL.dao.CourseDao;
@@ -15,13 +12,17 @@ import com.foxminded.Task7_SQL.dao.StudentDao;
 import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.entity.Student;
+import com.foxminded.Task7_SQL.utils.ReaderResources;
 
-public class GeneratorData {
+import static com.foxminded.Task7_SQL.utils.ReaderResources.*;
+
+public class GeneratorEntityDB {
     private StudentDao studentDao;
     private CourseDao courseDao;
     private GroupDao groupDao;
+    ReaderResources rd = new ReaderResources();
     
-    public GeneratorData(StudentDao studentDao, CourseDao courseDao, 
+    public GeneratorEntityDB(StudentDao studentDao, CourseDao courseDao, 
 	    GroupDao groupDao) {
 	this.studentDao = studentDao;
 	this.courseDao = courseDao;
@@ -48,15 +49,11 @@ public class GeneratorData {
     public void generateCourses() {
 	var spliterator = "_";
 	
-	try {
-	    readLine("Courses.txt").stream().forEach(line -> courseDao.save(
-	    	 new Course.CourseBuild()
-	    	.setName(line.split(spliterator)[0])
-	    	.setDescription(line.split(spliterator)[1])
-	    	.build()));
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
+	readFile("Courses.txt").stream().forEach(line -> courseDao.save(
+		 new Course.CourseBuild()
+		.setName(line.split(spliterator)[0])
+		.setDescription(line.split(spliterator)[1])
+		.build()));
 	
     }  
     
@@ -65,14 +62,10 @@ public class GeneratorData {
 	List<String> surname = new ArrayList<>();
 	var bound = 0;
 	var random = new Random();
-	
-	try{ 
-	    name = readLine("First_Name_Student.txt");
-	    surname = readLine("Last_Name_Student.txt");
-	    bound = name.size() - 1;
-	}catch(IOException ex) {
-	    ex.getStackTrace();
-	}
+	 
+	name = readFile("First_Name_Student.txt");
+	surname = readFile("Last_Name_Student.txt");
+	bound = name.size() - 1;
 	
 	for(int i = 1; 200 >= i; i++) {
 	    try {
@@ -84,21 +77,53 @@ public class GeneratorData {
 		e.printStackTrace();
 	    }
 	}
+    }
+    
+    public void  assignStudentsToGroups() throws SQLException {
+	var random = new Random();
 	
+	ArrayList<Student> students = studentDao.getAllData();
+	List<Group> groups = groupDao.getAllData();
+	ListIterator<Student> studentsId = students.listIterator();
+
+	for(var group : groups) {
+	    int countStudents = 10 + random.nextInt(30 - 10 + 1);
+	    var minStudent = 3; 
+	    var counter = 0;
+	    int quantityElements = getQuantityElements(studentsId);
+	    
+	    if (quantityElements < minStudent) {
+	            break;
+		}
 	
+	    while (counter < countStudents && studentsId.hasNext()) {
+		var student = studentsId.next();
+		student.setGroupId(group.getId());
+		studentDao.update(student);
+		studentsId.remove();
+		counter++;
+	    }
+	}
+    }
+   
+    private static<T> int getQuantityElements(ListIterator<T> iterators) {
+        var count = 0;
+	
+	while(iterators.hasNext()) {
+	    iterators.next();
+	    count ++;
+	}
+	
+	while(iterators.hasPrevious()) {
+	    iterators.previous();
+	}
+	
+	return count;
     }
     
     private String getRandomChar() {
-	Random rand = new Random();
-	return String.valueOf((char)(rand.nextInt(26) + 'a')).toUpperCase();
-    }
-    
-    private List<String> readLine(String fileName) throws IOException{
-	return Files.readAllLines(new File(Objects.requireNonNull(ClassLoader
-		.getSystemClassLoader()
-		.getResource(fileName)
-		.getFile()))
-		.toPath()
-		.toAbsolutePath());
+  	Random rand = new Random();
+  	
+  	return String.valueOf((char)(rand.nextInt(26) + 'a')).toUpperCase();
     }
 }

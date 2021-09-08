@@ -9,7 +9,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 
 public class ScriptRunnerDB {
     public static void createDataBase(String pathToScriptSQL) throws SQLException, FileNotFoundException  {
-	var connection = ConnectionManager.open();
+	var connection = DBCPDataSource.getConnection();
 	var runner = new ScriptRunner(connection);
 	Reader file = new FileReader(pathToScriptSQL);
 
