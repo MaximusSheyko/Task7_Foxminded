@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.foxminded.Task7_SQL.entity.Group;
-import com.foxminded.Task7_SQL.entity.Student;
-import com.foxminded.Task7_SQL.service.ConnectionManager;
+import com.foxminded.Task7_SQL.service.DBCPDataSource;
 
 public class GroupDao extends AbstractDao<Group> {
     
@@ -28,8 +27,8 @@ public class GroupDao extends AbstractDao<Group> {
     public List<Group> getAllData() throws SQLException {
 	List<Group> groups = new ArrayList<>();
 	
-	try(var statement = ConnectionManager.open()
-		.prepareStatement(GET_ALL_GROUPS)){
+	try(var con = DBCPDataSource.getConnection();
+	    var statement = con.prepareStatement(GET_ALL_GROUPS)){
 	    var resultSet = statement.executeQuery();
 	    
 	    while (resultSet.next()) {
@@ -46,11 +45,17 @@ public class GroupDao extends AbstractDao<Group> {
 
     @Override
     public void save(Group group) throws SQLException {
-	try(var statement = ConnectionManager.open()
-		.prepareStatement(SAVE_TO_TABLE)){
+	try(var con = DBCPDataSource.getConnection();
+	    var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, group.getName());
 	    statement.executeUpdate();
 	}
     }
-   
+
+    @Override
+    public void update(Group group) throws SQLException {
+	
+    }
+    
+    
 }
