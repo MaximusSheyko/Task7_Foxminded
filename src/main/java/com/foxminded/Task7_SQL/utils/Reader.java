@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ReaderResources {
+public class Reader {
     
-    public static List<String> readFile(String fileName) {
-	List<String> lines = new ArrayList<String>();
+    public List<String> read(String fileName) {
+	List<String> lines = new ArrayList<>();
 	try {
 	    lines = Files.readAllLines(new File(Objects.requireNonNull(ClassLoader
 	    	.getSystemClassLoader()
