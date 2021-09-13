@@ -6,10 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.foxminded.Task7_SQL.dao.interfaces.StudentQuery;
 import com.foxminded.Task7_SQL.entity.Student;
 import com.foxminded.Task7_SQL.service.DBCPDataSource;
 
-public class StudentDao extends AbstractDao<Student> {
+public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     
     private static final String GET_BY_ID = "SELECT * FROM students "
     	+ "WHERE student_id = ?";
@@ -47,10 +48,10 @@ public class StudentDao extends AbstractDao<Student> {
     }
 
     @Override
-    public void deleteById(int id) {
+    public<Integer> void deleteById(Integer id) {
 	try(var con = DBCPDataSource.getConnection();
 	    var statement = con.prepareStatement(REMOVE_BY_ID)){
-	   statement.setInt(1, id);
+	   statement.setInt(1, (int) id);
 	   statement.executeUpdate();
 	}catch (SQLException e) {
 	    e.getStackTrace();
@@ -86,7 +87,13 @@ public class StudentDao extends AbstractDao<Student> {
 	    PreparedStatement statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, studant.getFirstName());
 	    statement.setString(2, studant.getLastName());
-	    statement.setInt(3, studant.getGroupID());
+	    
+	    if(studant.getGroupID() != 0) {
+		statement.setInt(3, studant.getGroupID());
+	    }else {
+		statement.setNull(3, java.sql.Types.INTEGER);
+	    }
+
 	    statement.executeUpdate();
 	}
     }
@@ -103,15 +110,18 @@ public class StudentDao extends AbstractDao<Student> {
 	}
     }
     
-    public void addStudentToCourseById(int idStudent, int idCourse) {
+    @Override
+    public<Integer> void addStudentToCourseById(Integer idStudent, Integer idCourse) {
 	try(var connection = DBCPDataSource.getConnection();
 	    var statement = connection.prepareStatement
 		    (ADD_STUDENT_TO_COURSE);){
-	    statement.setInt(1, idStudent);
-	    statement.setInt(2, idCourse);
+	    statement.setInt(1, (int) idStudent);
+	    statement.setInt(2, (int) idCourse);
 	    statement.execute();
 	} catch (SQLException e) {
 	    e.printStackTrace();
 	}
     }
+    
+    
 }

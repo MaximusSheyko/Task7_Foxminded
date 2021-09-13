@@ -1,4 +1,4 @@
-package com.foxminded.Task7_SQL.service;
+package com.foxminded.Task7_SQL.ui.logic;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,6 +29,8 @@ public class MenuQueryLogic {
     public void findAllGroupsWithLessOrEqualsStudentCount() {
 	try (var scanner = new Scanner(System.in)) {
 	    var groups = groupDao.getAllData();
+	    
+	    out.println("Enter count student : ");
 	    var input = scanner.nextInt();
 	    boolean isFound = groups.stream()
 		    .anyMatch(group -> groupDao.countStudentInGroupById(group.getId()) <= input);

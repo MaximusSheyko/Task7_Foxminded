@@ -4,25 +4,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.foxminded.Task7_SQL.dao.interfaces.GroupQuery;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.service.DBCPDataSource;
 
-public class GroupDao extends AbstractDao<Group> {
+public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     
     private static final String SAVE_TO_TABLE = "INSERT INTO groups VALUES(default, ?)"; 
     private static final String GET_ALL_GROUPS = "SELECT * FROM groups";
     private static final String COUNT_STUDENT = "SELECT count(students.group_id) AS amount "
     	+ "FROM students WHERE students.group_id = ?";
-    
-    @Override
-    public Group getById(int id) throws SQLException {
-	return null;
-    }
-
-    @Override
-    public void deleteById(int id) throws SQLException {
-	
-    }
 
     @Override
     public List<Group> getAllData() {
@@ -60,7 +51,8 @@ public class GroupDao extends AbstractDao<Group> {
 	}
     }
     
-    public int countStudentInGroupById(int groupId) {
+    @Override
+    public Integer countStudentInGroupById(Integer groupId) {
 	var id = groupId;
 	
 	try(var con = DBCPDataSource.getConnection();
@@ -80,11 +72,4 @@ public class GroupDao extends AbstractDao<Group> {
 	
 	return groupId;
     }
-
-    @Override
-    public void update(Group group) throws SQLException {
-	
-    }
-    
-    
 }

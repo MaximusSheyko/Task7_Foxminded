@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.foxminded.Task7_SQL.dao.interfaces.CourseQuery;
 import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.service.DBCPDataSource;
-import com.sun.jdi.connect.spi.Connection;
 
-public class CourseDao extends AbstractDao<Course> {
+public class CourseDao extends AbstractDao<Course> implements CourseQuery<Integer> {
     
     private static final String SAVE_TO_TABLE = "INSERT INTO courses "
     	+ "(coursename, coursedescription)"
@@ -23,15 +23,6 @@ public class CourseDao extends AbstractDao<Course> {
     private static final String REMOVE_COURSE_FROM_STUDENT = "DELETE FROM students_courses"
     	+ " WHERE student_id = ?"
     	+ " AND course_id = ?";
-
-    @Override
-    public Course getById(int id) throws SQLException {
-	return null;
-    }
-
-    @Override
-    public void deleteById(int id) throws SQLException {
-    }
 
     @Override
     public List<Course> getAllData() {
@@ -66,15 +57,8 @@ public class CourseDao extends AbstractDao<Course> {
 	    e.getStackTrace();
 	}
     }
-
+    
     @Override
-    public void update(Course course) throws SQLException {
-    }
-    
-    public void addCourseToStudentById() {
-	
-    }
-    
     public List<Integer> getIdStudenstOnCourseByName(String courseName) {
 	List<Integer> idStudents = new ArrayList<>();
 	
@@ -94,8 +78,9 @@ public class CourseDao extends AbstractDao<Course> {
 	return idStudents;
     }
     
-    public List<Integer> getAllCoursesIdByStudentId(int studentId){
-	List<Integer> coursesId = new ArrayList<Integer>();
+    @Override
+    public List<Integer> getAllCoursesIdByStudentId(Integer studentId){
+	List<Integer> coursesId = new ArrayList<>();
 	
 	try(var connection = DBCPDataSource.getConnection();
 	    var statement = connection.prepareStatement(GET_ALL_COURSES)){
@@ -114,7 +99,8 @@ public class CourseDao extends AbstractDao<Course> {
 	return coursesId;
     }
     
-    public void deleteCourseForStudent(int studentId, int courseId) {
+    @Override
+    public void deleteCourseForStudent(Integer studentId, Integer courseId) {
 	try(var connection = DBCPDataSource.getConnection();
 	    var statement = connection.prepareStatement(REMOVE_COURSE_FROM_STUDENT)){
 	    	 statement.setInt(1, studentId);

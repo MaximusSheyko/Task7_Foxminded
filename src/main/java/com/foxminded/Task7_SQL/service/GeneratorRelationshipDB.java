@@ -27,7 +27,7 @@ public class GeneratorRelationshipDB {
 	this.courseDao = courseDao;
     }
     
-    public void  assignStudentsToGroups() throws SQLException {
+    public void  assignStudentsToGroups() {
 	var random = new Random();
 	List<Student> students = studentDao.getAllData();
 	List<Group> groups = groupDao.getAllData();
@@ -45,7 +45,13 @@ public class GeneratorRelationshipDB {
 	    while(idStudents.hasNext() && count < randomIteration) {
 		Student student = idStudents.next();
 		student.setGroupId(group.getId());
-		studentDao.update(student);
+		
+		try {
+		    studentDao.update(student);
+		} catch (SQLException e) {
+		    e.printStackTrace();
+		}
+		
 		count++;
 		idStudents.remove();
 	    }
@@ -67,7 +73,7 @@ public class GeneratorRelationshipDB {
 	return counter;
     }
     
-    public void assignCourseEachStudent() throws SQLException {
+    public void assignCourseEachStudent()  {
 	var  studentsId = studentDao.getAllData().stream()
 		.map(student -> student.getPersonalID())
 		.toList();

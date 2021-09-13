@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Student {
     private final int personalID;
-    private int groupID;
+    private Integer groupID;
     private String firstName;
     private String lastName;
     

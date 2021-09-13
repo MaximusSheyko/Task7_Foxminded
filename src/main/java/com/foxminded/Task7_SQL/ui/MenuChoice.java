@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Scanner;
 
-import com.foxminded.Task7_SQL.service.MenuQueryLogic;
+import com.foxminded.Task7_SQL.ui.logic.MenuQueryLogic;
 import com.foxminded.Task7_SQL.utils.Reader;
 
 public class MenuChoice { 
@@ -19,12 +20,9 @@ public class MenuChoice {
 	this.menuQueryLogic = menuQueryLogic;
     }
 
-    public String showChoice() throws IOException {
-	var input = new BufferedReader(new InputStreamReader(System.in));
+    public void showChoice() {
 	List<String> options = reader.read("Options");
 	options.forEach(System.out::println);
-	
-	return input.readLine();
     }
     
     public boolean selectChoice(String input) {
