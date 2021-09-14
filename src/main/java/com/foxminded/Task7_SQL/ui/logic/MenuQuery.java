@@ -10,38 +10,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.foxminded.Task7_SQL.dao.CourseDao;
 import com.foxminded.Task7_SQL.dao.GroupDao;
 import com.foxminded.Task7_SQL.dao.StudentDao;
+import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.entity.Student;
+import com.foxminded.Task7_SQL.service.MenuQueryLogic;
 
 import static java.lang.System.out;
 
-public class MenuQueryLogic {
-    GroupDao groupDao;
-    StudentDao studentDao;
-    CourseDao courseDao;
+public class MenuQuery {
+    MenuQueryLogic queryLogic;
 
-    public MenuQueryLogic(GroupDao groupDao, StudentDao studentDao, CourseDao courseDao) {
-	this.groupDao = groupDao;
-	this.studentDao = studentDao;
-	this.courseDao = courseDao;
+    public MenuQuery(MenuQueryLogic queryLogic) {
+	this.queryLogic = queryLogic;
     }
 
     public void findAllGroupsWithLessOrEqualsStudentCount() {
 	try (var scanner = new Scanner(System.in)) {
-	    var groups = groupDao.getAllData();
-	    
 	    out.println("Enter count student : ");
 	    var input = scanner.nextInt();
-	    boolean isFound = groups.stream()
-		    .anyMatch(group -> groupDao.countStudentInGroupById(group.getId()) <= input);
-
-	    if (isFound) {
-		groups.stream().filter(group -> groupDao.countStudentInGroupById(group.getId()) <= input)
-			.forEach(group -> out.println(group.getName() + ", amount students : "
-				+ groupDao.countStudentInGroupById(group.getId())));
-	    } else {
-		out.println("No groups found with that many students or less");
-	    }
+	   
+	    queryLogic.getCountStudentAllCourses()
+	    	.entrySet().stream().filter(key -> key.getValue() <= input)
+	    	.forEach(students -> out.println(queryLogic.getAllCourses()
+	    		.get(students.getKey() - 1).getName() + " amount students: "
+	    			+ queryLogic.getCountStudentAllCourses().get(students.getKey())));
 	}
 
     }
@@ -50,12 +42,13 @@ public class MenuQueryLogic {
 	try (var scanner = new Scanner(System.in)) {
 	    out.print("Please, enter course name : ");
 	    var courseName = scanner.next();
-	    var studentsFromCourse = courseDao.getIdStudenstOnCourseByName(courseName);
-	    boolean courseIsNoFound = studentsFromCourse.isEmpty();
+	    var studentsFromCourse = queryLogic.getAllStudentsOnCourses();
+	    boolean courseIsFound = studentsFromCourse.containsKey(courseName);
 
-	    if (!courseIsNoFound) {
-		studentsFromCourse.forEach(id -> out.println(String.format("%s %s;",
-			studentDao.getById(id).getFirstName(), studentDao.getById(id).getLastName())));
+	    if (courseIsFound) {
+		studentsFromCourse.keySet().forEach(corseName -> studentsFromCourse.get(corseName).stream()
+			.forEach(id -> out.println("Course: " + courseName + " - " 
+			    + queryLogic.getStudentByID(id))));
 	    } else {
 		out.println("Course is not found");
 	    }
@@ -69,21 +62,19 @@ public class MenuQueryLogic {
 	    var firstName = input.next();
 	    out.println("Please, enter student's lastname :");
 	    var lastName = input.next();
-	    groupDao.getAllData().forEach(out::println);
-
-	    idGroup = selectGroupId();
-
-	    try {
-		studentDao.save(new Student.StudentBuild().setFirstName(firstName).setLastName(lastName)
-			.setGroupID(idGroup).build());
-	    } catch (SQLException e) {
-		e.printStackTrace();
-	    }
+	    var groups = queryLogic.getAllGroups();
+	    
+	    groups.forEach(out::println);
+	    
+	    idGroup = selectGroupId(groups);
+	    queryLogic.saveStudentToTable(firstName, lastName, idGroup);
 	}
     }
 
-    private int selectGroupId() {
-	var idGroups = groupDao.getAllData().stream().sorted(Comparator.comparing(Group::getId)).map(Group::getId)
+    private int selectGroupId(List<Group> groups) {
+	var idGroups = groups.stream()
+		.sorted(Comparator.comparing(Group::getId))
+		.map(Group::getId)
 		.toList();
 	var idGroup = 0;
 
@@ -98,7 +89,8 @@ public class MenuQueryLogic {
     }
 
     public void deleteStudentById() {
-	var idStudents = studentDao.getAllData().stream().map(student -> student.getPersonalID()).toList();
+	var idStudents = queryLogic.getAllStudents()
+		.stream().map(student -> student.getPersonalID()).toList();
 	var idStudent = 0;
 
 	try (var input = new Scanner(System.in)) {
@@ -108,11 +100,12 @@ public class MenuQueryLogic {
 		idStudent = input.nextInt();
 	    } while (!idStudents.contains(idStudent));
 	}
-	studentDao.deleteById(idStudent);
+	
+	queryLogic.deleteStudentByID(idStudent);
     }
 
     public void addStudentToCourseFromList() {
-	List<String> saveIdCourses = new ArrayList<String>();
+	List<String> saveIdCourses = new ArrayList<>();
 	var currentStudentId = new AtomicInteger();
 
 	try (var scanner = new Scanner(System.in)) {
@@ -120,8 +113,9 @@ public class MenuQueryLogic {
 
 	    if (currentStudentId.get() != -1) {
 		saveIdCourses.addAll(selectCourses(scanner));
-		saveIdCourses
-			.forEach(id -> studentDao.addStudentToCourseById(currentStudentId.get(), Integer.valueOf(id)));
+		saveIdCourses.forEach(id -> queryLogic
+				.subscribeStudentToCourse(currentStudentId.get()
+					, Integer.valueOf(id)));
 	    } else {
 		out.print("Student was not added");
 	    }
@@ -129,7 +123,7 @@ public class MenuQueryLogic {
     }
 
     private int selectStudentId(Scanner scanner) {
-	List<String> idStudents = studentDao.getAllData().stream()
+	List<String> idStudents = queryLogic.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
 	String idStudent;
 
@@ -145,8 +139,9 @@ public class MenuQueryLogic {
 	return Integer.valueOf(idStudent);
     }
 
-    private List<String> selectCourses(Scanner scanner) {
-	List<String> idCourses = courseDao.getAllData().stream().map(course -> String.valueOf(course.getId())).toList();
+     private List<String> selectCourses(Scanner scanner) {
+	List<String> idCourses = queryLogic.getAllCourses().stream()
+		.map(course -> String.valueOf(course.getId())).toList();
 	List<String> saveIdCourses = new ArrayList<>();
 	String input;
 
@@ -156,7 +151,7 @@ public class MenuQueryLogic {
 	    input = scanner.next();
 
 	    if (input.equals("show")) {
-		courseDao.getAllData().forEach(out::println);
+		queryLogic.getAllCourses().forEach(out::println);
 	    }
 
 	    if (idCourses.contains(input)) {
@@ -175,9 +170,9 @@ public class MenuQueryLogic {
 	return saveIdCourses;
     }
 
-    public void removeStudentFromOneOfHisCourses() {
+     public void removeStudentFromOneOfHisCourses() {
 	List<String> coursesId = new ArrayList<>();
-	List<String> studentsId = studentDao.getAllData().stream()
+	List<String> studentsId = queryLogic.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
 	String studentId;
 	String courseId;
@@ -194,8 +189,7 @@ public class MenuQueryLogic {
 	    } while (!studentsId.contains(studentId));
 
 	    if (!studentId.equals("q")) {
-		coursesId = courseDao.getAllCoursesIdByStudentId(Integer.valueOf(studentId)).stream()
-			.map(course -> String.valueOf(course)).toList();
+		coursesId = queryLogic.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
 
 		do {
 		    out.println("Please, select the id of the course from which"
@@ -203,11 +197,12 @@ public class MenuQueryLogic {
 		    courseId = scanner.next().toLowerCase();
 
 		    if (courseId.equals("show")) {
-			courseDao.getAllData().forEach(out::println);
+			queryLogic.getAllCourses().forEach(out::println);
 		    }
 		} while (!coursesId.contains(courseId));
 
-		courseDao.deleteCourseForStudent(Integer.valueOf(studentId), Integer.valueOf(courseId));
+		queryLogic.unsubscribeStudentFromCourse(Integer.valueOf(studentId),
+			Integer.valueOf(courseId));
 	    } else {
 		out.print("Student was not selected");
 	    }

@@ -6,18 +6,18 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Scanner;
 
-import com.foxminded.Task7_SQL.ui.logic.MenuQueryLogic;
+import com.foxminded.Task7_SQL.ui.logic.MenuQuery;
 import com.foxminded.Task7_SQL.utils.Reader;
 
 public class MenuChoice { 
     Reader reader;
-    MenuQueryLogic menuQueryLogic;
+    MenuQuery menuQuery;
     private static final String EXCEPTION_ISNULL = "key is null";
     private static final String MESSAGE = "Misha let's go do it again!";
     
-    public MenuChoice(Reader reader, MenuQueryLogic menuQueryLogic) {
+    public MenuChoice(Reader reader, MenuQuery menuQuery) {
 	this.reader = reader;
-	this.menuQueryLogic = menuQueryLogic;
+	this.menuQuery = menuQuery;
     }
 
     public void showChoice() {
@@ -34,22 +34,22 @@ public class MenuChoice {
 
 	switch(input) {
 	    case "a":
-		menuQueryLogic.findAllGroupsWithLessOrEqualsStudentCount();
+		menuQuery.findAllGroupsWithLessOrEqualsStudentCount();
 		break;
 	    case "b":
-	    	menuQueryLogic.findStudentsRelatedToCourseName();
+	    	menuQuery.findStudentsRelatedToCourseName();
 		break;
 	    case "c":
-	    	menuQueryLogic.addStudent();
+	    	menuQuery.addStudent();
 		break;
 	    case "d":
-	    	menuQueryLogic.deleteStudentById();
+	    	menuQuery.deleteStudentById();
 		break;
 	    case "e":
-	    	menuQueryLogic.addStudentToCourseFromList();
+	    	menuQuery.addStudentToCourseFromList();
 		break;
 	    case "f":
-	        menuQueryLogic.removeStudentFromOneOfHisCourses();
+	        menuQuery.removeStudentFromOneOfHisCourses();
 	    	break;
 	    case "q":
 	    	flag = false;
