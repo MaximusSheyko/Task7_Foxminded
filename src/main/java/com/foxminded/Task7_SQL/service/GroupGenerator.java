@@ -6,7 +6,7 @@ import com.foxminded.Task7_SQL.dao.GroupDao;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.service.interfaces.Generator;
 
-public class GroupGenerator implements Generator<Group> {
+public class GroupGenerator implements Generator {
 
     private GroupDao groupDao;
 

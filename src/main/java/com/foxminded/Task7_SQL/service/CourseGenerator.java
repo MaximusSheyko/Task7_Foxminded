@@ -5,7 +5,7 @@ import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.service.interfaces.Generator;
 import com.foxminded.Task7_SQL.utils.Reader;
 
-public class CourseGenerator implements Generator<Course> {
+public class CourseGenerator implements Generator {
 
     private CourseDao courseDao;
     private Reader reader;

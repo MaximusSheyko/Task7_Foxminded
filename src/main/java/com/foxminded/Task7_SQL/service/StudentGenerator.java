@@ -1,4 +1,4 @@
-package com.foxminded.Task7_SQL.service.menuquery;
+package com.foxminded.Task7_SQL.service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import com.foxminded.Task7_SQL.entity.Student;
 import com.foxminded.Task7_SQL.service.interfaces.Generator;
 import com.foxminded.Task7_SQL.utils.Reader;
 
-public class StudentGenerator implements Generator<Student> {
+public class StudentGenerator implements Generator {
     
     private StudentDao studentDao;
     private Reader reader;

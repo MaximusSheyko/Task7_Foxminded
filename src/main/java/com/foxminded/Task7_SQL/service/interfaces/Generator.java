@@ -1,5 +1,5 @@
 package com.foxminded.Task7_SQL.service.interfaces;
 
-public interface Generator<T> {
+public interface Generator {
     public void generate();
 }
