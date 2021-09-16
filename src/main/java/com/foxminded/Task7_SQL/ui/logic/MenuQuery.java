@@ -7,8 +7,8 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.foxminded.Task7_SQL.entity.Group;
-import com.foxminded.Task7_SQL.service.GroupQuery;
 import com.foxminded.Task7_SQL.service.menuquery.CourseQuery;
+import com.foxminded.Task7_SQL.service.menuquery.GroupQuery;
 import com.foxminded.Task7_SQL.service.menuquery.StudentQuery;
 
 import static java.lang.System.out;
@@ -24,102 +24,92 @@ public class MenuQuery {
 	this.courseQuery = courseQuery;
     }
 
-    public void findAllGroupsWithLessOrEqualsStudentCount() {
-	try (var scanner = new Scanner(System.in)) {
-	    out.println("Enter count student : ");
-	    var input = scanner.nextInt();
-	 
-	    courseQuery.getCountStudentAllCourses()
-	    	.entrySet().stream().filter(key -> key.getValue() <= input)
-	    	.forEach(students -> out.println(courseQuery.getAllCourses()
-	    		.get(students.getKey() - 1).getName() + " amount students: "
-	    			+ courseQuery.getCountStudentAllCourses().get(students.getKey())));
-	}
+    public void findAllGroupsWithLessOrEqualsStudentCount(Scanner scanner) {
+	out.println("Enter count student : ");
+	var input = scanner.nextInt();
 
+	courseQuery.getCountStudentAllCourses().entrySet().stream()
+	.filter(key -> key.getValue() <= input)
+	.forEach(students -> out.println(courseQuery.getAllCourses()
+			.get(students.getKey() - 1).getName()
+			+ " amount students: " + courseQuery.getCountStudentAllCourses()
+			.get(students.getKey())));
     }
 
-    public void findStudentsRelatedToCourseName() {
-	try (var scanner = new Scanner(System.in)) {
-	    out.print("Please, enter course name : ");
-	    var courseName = scanner.next();
-	    var studentsFromCourse = courseQuery.getAllStudentsOnCourses();
-	    boolean courseIsFound = studentsFromCourse.containsKey(courseName);
+    public void findStudentsRelatedToCourseName(Scanner scanner) {
+	out.print("Please, enter course name : ");
+	var courseName = scanner.next();
+	var studentsFromCourse = courseQuery.getAllStudentsOnCourses();
+	boolean courseIsFound = studentsFromCourse.containsKey(courseName);
 
-	    if (courseIsFound) {
-		studentsFromCourse.keySet().forEach(corseName -> studentsFromCourse.get(corseName).stream()
-			.forEach(id -> out.println("Course: " + courseName + " - " 
-			    + studentQuery.getStudentByID(id))));
-	    } else {
-		out.println("Course is not found");
-	    }
+	if (courseIsFound) {
+	    studentsFromCourse.keySet().forEach(corseName -> studentsFromCourse.get(corseName).stream()
+		    .forEach(id -> out.println("Course: " + courseName + " - " + studentQuery
+			    .getStudentByID(id))));
+	} else {
+	    out.println("Course is not found");
 	}
     }
 
-    public void addStudent() {
-	try (var input = new Scanner(System.in)) {
-	    var idGroup = 0;
-	    out.println("Please, enter student's firstname :");
-	    var firstName = input.next();
-	    out.println("Please, enter student's lastname :");
-	    var lastName = input.next();
-	    var groups = groupQuery.getAllGroups();
-	    
-	    groups.forEach(out::println);
-	    
-	    idGroup = selectGroupId(groups);
-	    studentQuery.saveStudentToTable(firstName, lastName, idGroup);
-	}
+    public void addStudent(Scanner scanner) {
+	var idGroup = 0;
+	out.println("Please, enter student's firstname :");
+	var firstName = scanner.next();
+	out.println("Please, enter student's lastname :");
+	var lastName = scanner.next();
+	var groups = groupQuery.getAllGroups();
+
+	groups.forEach(out::println);
+
+	idGroup = selectGroupId(groups, scanner);
+	studentQuery.saveStudentToTable(firstName, lastName, idGroup);
     }
 
-    private int selectGroupId(List<Group> groups) {
+    private int selectGroupId(List<Group> groups, Scanner scanner) {
 	var idGroups = groups.stream()
 		.sorted(Comparator.comparing(Group::getId))
 		.map(Group::getId)
 		.toList();
 	var idGroup = 0;
-
-	try (var input = new Scanner(System.in)) {
+	
 	    do {
 		out.println("Please, enter group ID:");
-		idGroup = input.nextInt();
+		idGroup = scanner.nextInt();
 	    } while (!idGroups.contains(idGroup));
-	}
-
+	
 	return idGroup;
     }
 
-    public void deleteStudentById() {
-	var idStudents = studentQuery.getAllStudents()
-		.stream().map(student -> student.getPersonalID()).toList();
+    public void deleteStudentById(Scanner scanner) {
+	var idStudents = studentQuery.getAllStudents().stream()
+		.map(student -> student.getPersonalID()).toList();
 	var idStudent = 0;
-
-	try (var input = new Scanner(System.in)) {
-
-	    do {
-		out.print("Enter student's id to remove: ");
-		idStudent = input.nextInt();
-	    } while (!idStudents.contains(idStudent));
-	}
 	
+	do {
+	    out.print("Enter student's id to remove: ");
+	    idStudent = scanner.nextInt();
+	} while (!idStudents.contains(idStudent));
+	
+	out.println("Student has been deleted");
 	studentQuery.deleteStudentByID(idStudent);
     }
 
-    public void addStudentToCourseFromList() {
+    public void addStudentToCourseFromList(Scanner scanner) {
 	List<String> saveIdCourses = new ArrayList<>();
 	var currentStudentId = new AtomicInteger();
 
-	try (var scanner = new Scanner(System.in)) {
-	    currentStudentId.set(selectStudentId(scanner));
+	currentStudentId.set(selectStudentId(scanner));
 
-	    if (currentStudentId.get() != -1) {
-		saveIdCourses.addAll(selectCourses(scanner));
-		saveIdCourses.forEach(id -> studentQuery
-				.subscribeStudentToCourse(currentStudentId.get()
-					, Integer.valueOf(id)));
-	    } else {
-		out.print("Student was not added");
-	    }
+	if (currentStudentId.get() != -1) {
+	    saveIdCourses.addAll(selectCourses(scanner));
+	    saveIdCourses
+		    .forEach(id -> 
+		    studentQuery.subscribeStudentToCourse(currentStudentId.get()
+			    , Integer.valueOf(id)));
+	} else {
+	    out.print("Student has not been added");
 	}
+
     }
 
     private int selectStudentId(Scanner scanner) {
@@ -170,42 +160,39 @@ public class MenuQuery {
 	return saveIdCourses;
     }
 
-     public void removeStudentFromOneOfHisCourses() {
+    public void removeStudentFromOneOfHisCourses(Scanner scanner) {
 	List<String> coursesId = new ArrayList<>();
 	List<String> studentsId = studentQuery.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
 	String studentId;
 	String courseId;
 
-	try (var scanner = new Scanner(System.in)) {
-	    do {
-		out.println("Please, select students id from 1 to " + studentsId.size() + " or enter 'q' to exit");
-		studentId = scanner.next();
+	do {
+	    out.println("Please, select students id from 1 to " + studentsId.size() + " or enter 'q' to exit");
+	    studentId = scanner.next();
 
-		if (studentId.equals("q")) {
-		    break;
-		}
-
-	    } while (!studentsId.contains(studentId));
-
-	    if (!studentId.equals("q")) {
-		coursesId = courseQuery.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
-
-		do {
-		    out.println("Please, select the id of the course from which"
-			    + " to undsubscribe. Enter 'show' for view student courses");
-		    courseId = scanner.next().toLowerCase();
-
-		    if (courseId.equals("show")) {
-			courseQuery.getAllCourses().forEach(out::println);
-		    }
-		} while (!coursesId.contains(courseId));
-
-		courseQuery.unsubscribeStudentFromCourse(Integer.valueOf(studentId),
-			Integer.valueOf(courseId));
-	    } else {
-		out.print("Student was not selected");
+	    if (studentId.equals("q")) {
+		break;
 	    }
+
+	} while (!studentsId.contains(studentId));
+
+	if (!studentId.equals("q")) {
+	    coursesId = courseQuery.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
+
+	    do {
+		out.println("Please, select the id of the course from which"
+			+ " to undsubscribe. Enter 'show' for view student courses");
+		courseId = scanner.next().toLowerCase();
+
+		if (courseId.equals("show")) {
+		    courseQuery.getAllCourses().forEach(out::println);
+		}
+	    } while (!coursesId.contains(courseId));
+
+	    courseQuery.unsubscribeStudentFromCourse(Integer.valueOf(studentId), Integer.valueOf(courseId));
+	} else {
+	    out.print("Student was not selected");
 	}
     }
 }

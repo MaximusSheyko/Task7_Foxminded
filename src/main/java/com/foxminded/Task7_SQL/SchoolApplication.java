@@ -6,16 +6,18 @@ import com.foxminded.Task7_SQL.dao.StudentDao;
 import com.foxminded.Task7_SQL.service.CourseGenerator;
 import com.foxminded.Task7_SQL.service.GeneratorRelationshipDB;
 import com.foxminded.Task7_SQL.service.GroupGenerator;
-import com.foxminded.Task7_SQL.service.GroupQuery;
 import com.foxminded.Task7_SQL.service.ScriptRunnerDB;
+import com.foxminded.Task7_SQL.service.StudentGenerator;
 import com.foxminded.Task7_SQL.service.menuquery.CourseQuery;
-import com.foxminded.Task7_SQL.service.menuquery.StudentGenerator;
+import com.foxminded.Task7_SQL.service.menuquery.GroupQuery;
 import com.foxminded.Task7_SQL.service.menuquery.StudentQuery;
 import com.foxminded.Task7_SQL.ui.MenuChoice;
 import com.foxminded.Task7_SQL.ui.logic.MenuQuery;
 import com.foxminded.Task7_SQL.utils.Reader;
 
 import static java.lang.System.*;
+
+import java.util.Scanner;
 
 public class SchoolApplication {
     StudentGenerator studentGenerator;
@@ -72,10 +74,21 @@ public class SchoolApplication {
 
     public void run() {
 	var flag = true;
-	choiceMenu.showChoice();
 	
-	while(flag) {
-	   flag = choiceMenu.selectChoice("a");
+	try(var scanner = new Scanner(System.in)){
+	    
+	    while(flag) {
+		System.out.println("Choose an option to continue."
+			+ " Enter 'help' to show options");
+		var option = choiceMenu.readChoice(scanner).toLowerCase();
+		
+		if(!option.equals("help")) {
+		    flag = choiceMenu.selectChoice(option, scanner);
+		}else {
+		    choiceMenu.showChoice();
+		}
+	        
+	    }
 	}
     }
 }

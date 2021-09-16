@@ -1,4 +1,4 @@
-package com.foxminded.Task7_SQL.service;
+package com.foxminded.Task7_SQL.service.menuquery;
 
 import java.util.List;
 

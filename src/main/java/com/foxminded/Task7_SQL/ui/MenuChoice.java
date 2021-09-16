@@ -1,8 +1,5 @@
 package com.foxminded.Task7_SQL.ui;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,13 +16,16 @@ public class MenuChoice {
 	this.reader = reader;
 	this.menuQuery = menuQuery;
     }
-
+    
     public void showChoice() {
-	List<String> options = reader.read("Options");
-	options.forEach(System.out::println);
+	reader.read("Options").forEach(System.out::println);
+    }
+
+    public String readChoice(Scanner scanner) {
+	return scanner.next();
     }
     
-    public boolean selectChoice(String input) {
+    public boolean selectChoice(String input, Scanner scanner) {
 	if(input == null) {
 	    throw new IllegalArgumentException(EXCEPTION_ISNULL);
 	}
@@ -34,22 +34,22 @@ public class MenuChoice {
 
 	switch(input) {
 	    case "a":
-		menuQuery.findAllGroupsWithLessOrEqualsStudentCount();
+		menuQuery.findAllGroupsWithLessOrEqualsStudentCount(scanner);
 		break;
 	    case "b":
-	    	menuQuery.findStudentsRelatedToCourseName();
+	    	menuQuery.findStudentsRelatedToCourseName(scanner);
 		break;
 	    case "c":
-	    	menuQuery.addStudent();
+	    	menuQuery.addStudent(scanner);
 		break;
 	    case "d":
-	    	menuQuery.deleteStudentById();
+	    	menuQuery.deleteStudentById(scanner);
 		break;
 	    case "e":
-	    	menuQuery.addStudentToCourseFromList();
+	    	menuQuery.addStudentToCourseFromList(scanner);
 		break;
 	    case "f":
-	        menuQuery.removeStudentFromOneOfHisCourses();
+	        menuQuery.removeStudentFromOneOfHisCourses(scanner);
 	    	break;
 	    case "q":
 	    	flag = false;
