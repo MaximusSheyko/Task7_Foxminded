@@ -23,6 +23,9 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     private static final String REMOVE_COURSE_FROM_STUDENT = "DELETE FROM students_courses"
     	+ " WHERE student_id = ?"
     	+ " AND course_id = ?";
+    private static final String ALL_STUDENTS_ON_COURSE = "SELECT count(student_id)"
+    	+ " AS totalStudents"
+    	+ " FROM students_courses WHERE course_id = ?;";
 
     @Override
     public List<Course> getAllData() {
@@ -110,4 +113,23 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
 	    e.getStackTrace();
 	}
     }
+
+    @Override
+    public Integer countAllStudentsByStudentID(Integer studentId) {
+	var amountStudents = 0;
+	
+	try(var connection = DBCPDataSource.getConnection();
+	    var statement = connection.prepareStatement(ALL_STUDENTS_ON_COURSE)){
+	    statement.setInt(1, studentId);
+	  
+	    try(var resultSet = statement.executeQuery()){
+		amountStudents = resultSet.next()?resultSet.getInt(1):0;
+		}
+	    }catch (SQLException e) {
+		e.getStackTrace();
+	    }
+	
+	return amountStudents;
+    }
 }
+

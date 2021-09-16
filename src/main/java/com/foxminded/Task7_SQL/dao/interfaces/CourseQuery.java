@@ -6,4 +6,5 @@ public interface CourseQuery<T> {
     public void deleteCourseForStudent(T studentId, T courseId);
     public List<T> getAllCoursesIdByStudentId(T studentId);
     public List<T> getIdStudenstOnCourseByName(String courseName);
+    public T countAllStudentsByStudentID(T studentId); 
 }
