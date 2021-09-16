@@ -1,39 +1,39 @@
 package com.foxminded.Task7_SQL.ui.logic;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.foxminded.Task7_SQL.dao.CourseDao;
-import com.foxminded.Task7_SQL.dao.GroupDao;
-import com.foxminded.Task7_SQL.dao.StudentDao;
-import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.entity.Group;
-import com.foxminded.Task7_SQL.entity.Student;
-import com.foxminded.Task7_SQL.service.MenuQueryLogic;
+import com.foxminded.Task7_SQL.service.GroupQuery;
+import com.foxminded.Task7_SQL.service.menuquery.CourseQuery;
+import com.foxminded.Task7_SQL.service.menuquery.StudentQuery;
 
 import static java.lang.System.out;
 
 public class MenuQuery {
-    MenuQueryLogic queryLogic;
-
-    public MenuQuery(MenuQueryLogic queryLogic) {
-	this.queryLogic = queryLogic;
+    StudentQuery studentQuery;
+    GroupQuery groupQuery;
+    CourseQuery courseQuery;
+    
+    public MenuQuery(StudentQuery studentQuery, GroupQuery groupQuery, CourseQuery courseQuery) {
+	this.studentQuery = studentQuery;
+	this.groupQuery = groupQuery;
+	this.courseQuery = courseQuery;
     }
 
     public void findAllGroupsWithLessOrEqualsStudentCount() {
 	try (var scanner = new Scanner(System.in)) {
 	    out.println("Enter count student : ");
 	    var input = scanner.nextInt();
-	   
-	    queryLogic.getCountStudentAllCourses()
+	 
+	    courseQuery.getCountStudentAllCourses()
 	    	.entrySet().stream().filter(key -> key.getValue() <= input)
-	    	.forEach(students -> out.println(queryLogic.getAllCourses()
+	    	.forEach(students -> out.println(courseQuery.getAllCourses()
 	    		.get(students.getKey() - 1).getName() + " amount students: "
-	    			+ queryLogic.getCountStudentAllCourses().get(students.getKey())));
+	    			+ courseQuery.getCountStudentAllCourses().get(students.getKey())));
 	}
 
     }
@@ -42,13 +42,13 @@ public class MenuQuery {
 	try (var scanner = new Scanner(System.in)) {
 	    out.print("Please, enter course name : ");
 	    var courseName = scanner.next();
-	    var studentsFromCourse = queryLogic.getAllStudentsOnCourses();
+	    var studentsFromCourse = courseQuery.getAllStudentsOnCourses();
 	    boolean courseIsFound = studentsFromCourse.containsKey(courseName);
 
 	    if (courseIsFound) {
 		studentsFromCourse.keySet().forEach(corseName -> studentsFromCourse.get(corseName).stream()
 			.forEach(id -> out.println("Course: " + courseName + " - " 
-			    + queryLogic.getStudentByID(id))));
+			    + studentQuery.getStudentByID(id))));
 	    } else {
 		out.println("Course is not found");
 	    }
@@ -62,12 +62,12 @@ public class MenuQuery {
 	    var firstName = input.next();
 	    out.println("Please, enter student's lastname :");
 	    var lastName = input.next();
-	    var groups = queryLogic.getAllGroups();
+	    var groups = groupQuery.getAllGroups();
 	    
 	    groups.forEach(out::println);
 	    
 	    idGroup = selectGroupId(groups);
-	    queryLogic.saveStudentToTable(firstName, lastName, idGroup);
+	    studentQuery.saveStudentToTable(firstName, lastName, idGroup);
 	}
     }
 
@@ -89,7 +89,7 @@ public class MenuQuery {
     }
 
     public void deleteStudentById() {
-	var idStudents = queryLogic.getAllStudents()
+	var idStudents = studentQuery.getAllStudents()
 		.stream().map(student -> student.getPersonalID()).toList();
 	var idStudent = 0;
 
@@ -101,7 +101,7 @@ public class MenuQuery {
 	    } while (!idStudents.contains(idStudent));
 	}
 	
-	queryLogic.deleteStudentByID(idStudent);
+	studentQuery.deleteStudentByID(idStudent);
     }
 
     public void addStudentToCourseFromList() {
@@ -113,7 +113,7 @@ public class MenuQuery {
 
 	    if (currentStudentId.get() != -1) {
 		saveIdCourses.addAll(selectCourses(scanner));
-		saveIdCourses.forEach(id -> queryLogic
+		saveIdCourses.forEach(id -> studentQuery
 				.subscribeStudentToCourse(currentStudentId.get()
 					, Integer.valueOf(id)));
 	    } else {
@@ -123,7 +123,7 @@ public class MenuQuery {
     }
 
     private int selectStudentId(Scanner scanner) {
-	List<String> idStudents = queryLogic.getAllStudents().stream()
+	List<String> idStudents = studentQuery.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
 	String idStudent;
 
@@ -140,7 +140,7 @@ public class MenuQuery {
     }
 
      private List<String> selectCourses(Scanner scanner) {
-	List<String> idCourses = queryLogic.getAllCourses().stream()
+	List<String> idCourses = courseQuery.getAllCourses().stream()
 		.map(course -> String.valueOf(course.getId())).toList();
 	List<String> saveIdCourses = new ArrayList<>();
 	String input;
@@ -151,7 +151,7 @@ public class MenuQuery {
 	    input = scanner.next();
 
 	    if (input.equals("show")) {
-		queryLogic.getAllCourses().forEach(out::println);
+		courseQuery.getAllCourses().forEach(out::println);
 	    }
 
 	    if (idCourses.contains(input)) {
@@ -172,7 +172,7 @@ public class MenuQuery {
 
      public void removeStudentFromOneOfHisCourses() {
 	List<String> coursesId = new ArrayList<>();
-	List<String> studentsId = queryLogic.getAllStudents().stream()
+	List<String> studentsId = studentQuery.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
 	String studentId;
 	String courseId;
@@ -189,7 +189,7 @@ public class MenuQuery {
 	    } while (!studentsId.contains(studentId));
 
 	    if (!studentId.equals("q")) {
-		coursesId = queryLogic.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
+		coursesId = courseQuery.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
 
 		do {
 		    out.println("Please, select the id of the course from which"
@@ -197,11 +197,11 @@ public class MenuQuery {
 		    courseId = scanner.next().toLowerCase();
 
 		    if (courseId.equals("show")) {
-			queryLogic.getAllCourses().forEach(out::println);
+			courseQuery.getAllCourses().forEach(out::println);
 		    }
 		} while (!coursesId.contains(courseId));
 
-		queryLogic.unsubscribeStudentFromCourse(Integer.valueOf(studentId),
+		courseQuery.unsubscribeStudentFromCourse(Integer.valueOf(studentId),
 			Integer.valueOf(courseId));
 	    } else {
 		out.print("Student was not selected");

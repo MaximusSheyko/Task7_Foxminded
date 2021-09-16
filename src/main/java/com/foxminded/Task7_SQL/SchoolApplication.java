@@ -6,10 +6,13 @@ import com.foxminded.Task7_SQL.dao.StudentDao;
 import com.foxminded.Task7_SQL.service.CourseGenerator;
 import com.foxminded.Task7_SQL.service.GeneratorRelationshipDB;
 import com.foxminded.Task7_SQL.service.GroupGenerator;
+import com.foxminded.Task7_SQL.service.GroupQuery;
 import com.foxminded.Task7_SQL.service.ScriptRunnerDB;
-import com.foxminded.Task7_SQL.service.StudentGenerator;
+import com.foxminded.Task7_SQL.service.menuquery.CourseQuery;
+import com.foxminded.Task7_SQL.service.menuquery.StudentGenerator;
+import com.foxminded.Task7_SQL.service.menuquery.StudentQuery;
 import com.foxminded.Task7_SQL.ui.MenuChoice;
-import com.foxminded.Task7_SQL.ui.logic.MenuQueryLogic;
+import com.foxminded.Task7_SQL.ui.logic.MenuQuery;
 import com.foxminded.Task7_SQL.utils.Reader;
 
 import static java.lang.System.*;
@@ -21,7 +24,10 @@ public class SchoolApplication {
     GroupGenerator groupGenerator;
     Reader reader;
     MenuChoice choiceMenu;
-    MenuQueryLogic menuQueryLogic;
+    MenuQuery menuQuery;
+    StudentQuery studentQuery;
+    CourseQuery courseQuery;
+    GroupQuery groupQuery;
     
     StudentDao studentDao;
     CourseDao courseDao;
@@ -31,9 +37,12 @@ public class SchoolApplication {
 	this.studentDao = studentDao;
 	this.courseDao = courseDao;
 	this.groupDao = groupDao;
+	courseQuery = new CourseQuery(courseDao);
+	studentQuery = new StudentQuery(studentDao);
+	groupQuery = new GroupQuery(groupDao);
 	reader = new Reader();
-	menuQueryLogic = new MenuQueryLogic(groupDao, studentDao, courseDao);
-	choiceMenu = new MenuChoice(reader, menuQueryLogic);
+	menuQuery = new MenuQuery(studentQuery, groupQuery, courseQuery);
+	choiceMenu = new MenuChoice(reader, menuQuery);
 	
 	out.println("Welcome, step 1: Run script to create data base!");
 	ScriptRunnerDB.createDataBase("resources/db_setup.sql");

@@ -1,4 +1,4 @@
-package com.foxminded.Task7_SQL.service;
+package com.foxminded.Task7_SQL.service.menuquery;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
