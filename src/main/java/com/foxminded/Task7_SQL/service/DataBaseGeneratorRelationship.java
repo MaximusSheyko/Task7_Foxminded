@@ -15,12 +15,12 @@ import com.foxminded.Task7_SQL.dao.StudentDao;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.entity.Student;
 
-public class GeneratorRelationshipDB {
+public class DataBaseGeneratorRelationship {
     private StudentDao studentDao;
     private GroupDao groupDao;
     private CourseDao courseDao;
     
-    public GeneratorRelationshipDB(StudentDao studentDao, 
+    public DataBaseGeneratorRelationship(StudentDao studentDao, 
 	    GroupDao groupDao, CourseDao courseDao) {
 	this.studentDao = studentDao;
 	this.groupDao = groupDao;
