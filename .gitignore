@@ -4,3 +4,4 @@
 *.settings
 *.properties
 *.classpath
+!Switch_DB.properties
