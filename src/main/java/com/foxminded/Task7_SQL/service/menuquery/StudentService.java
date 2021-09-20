@@ -6,10 +6,10 @@ import java.util.List;
 import com.foxminded.Task7_SQL.dao.StudentDao;
 import com.foxminded.Task7_SQL.entity.Student;
 
-public class StudentQuery {
+public class StudentService {
     private StudentDao dao;
       
-    public StudentQuery(StudentDao dao) {
+    public StudentService(StudentDao dao) {
 	this.dao = dao;
     }
 

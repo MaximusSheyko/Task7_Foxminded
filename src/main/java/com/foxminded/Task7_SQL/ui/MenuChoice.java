@@ -1,14 +1,13 @@
 package com.foxminded.Task7_SQL.ui;
 
-import java.util.List;
 import java.util.Scanner;
 
 import com.foxminded.Task7_SQL.ui.logic.MenuQuery;
 import com.foxminded.Task7_SQL.utils.Reader;
 
 public class MenuChoice { 
-    Reader reader;
-    MenuQuery menuQuery;
+    private Reader reader;
+    private MenuQuery menuQuery;
     private static final String EXCEPTION_ISNULL = "key is null";
     private static final String MESSAGE = "Misha let's go do it again!";
     

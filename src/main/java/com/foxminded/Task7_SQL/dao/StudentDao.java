@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.foxminded.Task7_SQL.dao.interfaces.StudentQuery;
 import com.foxminded.Task7_SQL.entity.Student;
-import com.foxminded.Task7_SQL.service.DBCPDataSource;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
 public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     
@@ -29,7 +29,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public Student getById(int id) {
 	Student student = null;
 	
-	try(var con = DBCPDataSource.getConnection();
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(GET_BY_ID)){
 	    statement.setInt(1, id);
 	    try(var resultSet = statement.executeQuery()){
@@ -48,21 +48,25 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     }
 
     @Override
-    public<Integer> void deleteById(Integer id) {
-	try(var con = DBCPDataSource.getConnection();
+    public<Integer> Boolean deleteById(Integer id) {
+	boolean studentIsDeleted = true;
+	
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(REMOVE_BY_ID)){
 	   statement.setInt(1, (int) id);
-	   statement.executeUpdate();
+	   studentIsDeleted = (statement.executeUpdate() != 1) ? false : true;	
 	}catch (SQLException e) {
 	    e.getStackTrace();
 	}
+	
+	return studentIsDeleted;
     }
 
     @Override
     public List<Student> getAllData() {
 	List<Student> students = new ArrayList<>();
 	
-	try(var con = DBCPDataSource.getConnection();
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(GET_ALL_STUDENTS);
 	    var resultSet = statement.executeQuery()){
 	    
@@ -82,8 +86,10 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     }
     
     @Override
-    public void save(Student studant) throws SQLException {
-	try(Connection con = DBCPDataSource.getConnection();
+    public Boolean save(Student studant) throws SQLException {
+	var studentIsSave = true;
+	
+	try(Connection con = ConnectionPoolManager.getConnection();
 	    PreparedStatement statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, studant.getFirstName());
 	    statement.setString(2, studant.getLastName());
@@ -93,35 +99,43 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
 	    }else {
 		statement.setNull(3, java.sql.Types.INTEGER);
 	    }
-
-	    statement.executeUpdate();
+	   
+	    studentIsSave = (statement.executeUpdate() != 1)? false: true;  
 	}
+	
+	return studentIsSave;
     }
     
     @Override
-    public void update(Student student) throws SQLException {
-	try(var con = DBCPDataSource.getConnection();
+    public boolean update(Student student) throws SQLException {
+	var studentIsUpdate = true;
+	
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(UPDATE_STUDENT)){
 	    statement.setInt(1, student.getGroupID());
 	    statement.setString(2, student.getFirstName());
 	    statement.setString(3, student.getLastName());
 	    statement.setInt(4, student.getPersonalID());
-	    statement.executeUpdate();
+	    studentIsUpdate = statement.executeUpdate() != 1 ? false : true;
 	}
+	
+	return studentIsUpdate;
     }
     
     @Override
-    public<Integer> void addStudentToCourseById(Integer idStudent, Integer idCourse) {
-	try(var connection = DBCPDataSource.getConnection();
+    public<Integer> Boolean addStudentToCourseById(Integer idStudent, Integer idCourse) {
+	var studentIsAdded = true;
+	
+	try(var connection = ConnectionPoolManager.getConnection();
 	    var statement = connection.prepareStatement
 		    (ADD_STUDENT_TO_COURSE);){
 	    statement.setInt(1, (int) idStudent);
 	    statement.setInt(2, (int) idCourse);
-	    statement.execute();
+	    studentIsAdded = !statement.execute();
 	} catch (SQLException e) {
-	    e.printStackTrace();
+	    e.getStackTrace();
 	}
-    }
-    
-    
+	
+	return studentIsAdded;
+    }  
 }

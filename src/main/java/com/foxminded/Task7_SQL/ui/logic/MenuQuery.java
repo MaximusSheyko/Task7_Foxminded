@@ -7,18 +7,18 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.foxminded.Task7_SQL.entity.Group;
-import com.foxminded.Task7_SQL.service.menuquery.CourseQuery;
-import com.foxminded.Task7_SQL.service.menuquery.GroupQuery;
-import com.foxminded.Task7_SQL.service.menuquery.StudentQuery;
+import com.foxminded.Task7_SQL.service.menuquery.CourseService;
+import com.foxminded.Task7_SQL.service.menuquery.GroupService;
+import com.foxminded.Task7_SQL.service.menuquery.StudentService;
 
 import static java.lang.System.out;
 
 public class MenuQuery {
-    StudentQuery studentQuery;
-    GroupQuery groupQuery;
-    CourseQuery courseQuery;
+    private StudentService studentQuery;
+    private GroupService groupQuery;
+    private CourseService courseQuery;
     
-    public MenuQuery(StudentQuery studentQuery, GroupQuery groupQuery, CourseQuery courseQuery) {
+    public MenuQuery(StudentService studentQuery, GroupService groupQuery, CourseService courseQuery) {
 	this.studentQuery = studentQuery;
 	this.groupQuery = groupQuery;
 	this.courseQuery = courseQuery;
@@ -61,37 +61,21 @@ public class MenuQuery {
 
 	groups.forEach(out::println);
 
-	idGroup = selectGroupId(groups, scanner);
+	idGroup = selectGroupIdFromListGroups(groups, scanner);
 	studentQuery.saveStudentToTable(firstName, lastName, idGroup);
     }
 
-    private int selectGroupId(List<Group> groups, Scanner scanner) {
-	var idGroups = groups.stream()
-		.sorted(Comparator.comparing(Group::getId))
-		.map(Group::getId)
-		.toList();
-	var idGroup = 0;
-	
-	    do {
-		out.println("Please, enter group ID:");
-		idGroup = scanner.nextInt();
-	    } while (!idGroups.contains(idGroup));
-	
-	return idGroup;
-    }
-
     public void deleteStudentById(Scanner scanner) {
-	var idStudents = studentQuery.getAllStudents().stream()
-		.map(student -> student.getPersonalID()).toList();
-	var idStudent = 0;
+	out.println("Please, select student's id to remove:");
+	var idStudent = selectStudentId(scanner);
 	
-	do {
-	    out.print("Enter student's id to remove: ");
-	    idStudent = scanner.nextInt();
-	} while (!idStudents.contains(idStudent));
+	if (idStudent != -1) {
+	    out.println("Student has been deleted");
+	    studentQuery.deleteStudentByID(idStudent);
+	}else {
+	    out.println("Student not selected"); 
+	}
 	
-	out.println("Student has been deleted");
-	studentQuery.deleteStudentByID(idStudent);
     }
 
     public void addStudentToCourseFromList(Scanner scanner) {
@@ -112,6 +96,32 @@ public class MenuQuery {
 
     }
 
+    public void removeStudentFromOneOfHisCourses(Scanner scanner) {
+	var studentId = selectStudentId(scanner);
+	
+	if (studentId != -1) {
+	    var courseId = selectCourseIdByStudentId(scanner, studentId);
+	    courseQuery.unsubscribeStudentFromCourse(studentId, courseId);
+	} else {
+	    out.print("Student was not selected");
+	}
+    }
+    
+    private int selectGroupIdFromListGroups(List<Group> groups, Scanner scanner) {
+	var idGroups = groups.stream()
+		.sorted(Comparator.comparing(Group::getId))
+		.map(Group::getId)
+		.toList();
+	var idGroup = 0;
+
+	do {
+	    out.println("Please, enter group ID:");
+	    idGroup = scanner.nextInt();
+	} while (!idGroups.contains(idGroup));
+	
+	return idGroup;
+    }
+    
     private int selectStudentId(Scanner scanner) {
 	List<String> idStudents = studentQuery.getAllStudents().stream()
 		.map(student -> String.valueOf(student.getPersonalID())).toList();
@@ -129,7 +139,7 @@ public class MenuQuery {
 	return Integer.valueOf(idStudent);
     }
 
-     private List<String> selectCourses(Scanner scanner) {
+    private List<String> selectCourses(Scanner scanner) {
 	List<String> idCourses = courseQuery.getAllCourses().stream()
 		.map(course -> String.valueOf(course.getId())).toList();
 	List<String> saveIdCourses = new ArrayList<>();
@@ -159,40 +169,21 @@ public class MenuQuery {
 
 	return saveIdCourses;
     }
-
-    public void removeStudentFromOneOfHisCourses(Scanner scanner) {
-	List<String> coursesId = new ArrayList<>();
-	List<String> studentsId = studentQuery.getAllStudents().stream()
-		.map(student -> String.valueOf(student.getPersonalID())).toList();
-	String studentId;
+    
+    private Integer selectCourseIdByStudentId(Scanner scanner, Integer studentId) {
+	var coursesId = courseQuery.getAllCoursesIdByStudentId(studentId);
 	String courseId;
-
+	
 	do {
-	    out.println("Please, select students id from 1 to " + studentsId.size() + " or enter 'q' to exit");
-	    studentId = scanner.next();
+	    out.println("Please, select the id of the course from which"
+		    + " to undsubscribe. Enter 'show' for view student courses");
+	    courseId = scanner.next().toLowerCase();
 
-	    if (studentId.equals("q")) {
-		break;
+	    if (courseId.equals("show")) {
+		courseQuery.getAllCourses().forEach(out::println);
 	    }
-
-	} while (!studentsId.contains(studentId));
-
-	if (!studentId.equals("q")) {
-	    coursesId = courseQuery.getAllCoursesIdByStudentId(Integer.parseInt(studentId));
-
-	    do {
-		out.println("Please, select the id of the course from which"
-			+ " to undsubscribe. Enter 'show' for view student courses");
-		courseId = scanner.next().toLowerCase();
-
-		if (courseId.equals("show")) {
-		    courseQuery.getAllCourses().forEach(out::println);
-		}
-	    } while (!coursesId.contains(courseId));
-
-	    courseQuery.unsubscribeStudentFromCourse(Integer.valueOf(studentId), Integer.valueOf(courseId));
-	} else {
-	    out.print("Student was not selected");
-	}
+	} while (!coursesId.contains(courseId));
+	
+	return Integer.valueOf(courseId);
     }
 }
