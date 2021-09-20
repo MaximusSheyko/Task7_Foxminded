@@ -5,10 +5,10 @@ import java.util.List;
 import com.foxminded.Task7_SQL.dao.GroupDao;
 import com.foxminded.Task7_SQL.entity.Group;
 
-public class GroupQuery {
-    GroupDao dao;
+public class GroupService {
+    private GroupDao dao;
     
-    public GroupQuery(GroupDao dao) {
+    public GroupService(GroupDao dao) {
 	this.dao = dao;
     }
 

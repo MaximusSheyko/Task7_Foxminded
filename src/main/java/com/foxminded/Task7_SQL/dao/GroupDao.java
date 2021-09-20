@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.foxminded.Task7_SQL.dao.interfaces.GroupQuery;
 import com.foxminded.Task7_SQL.entity.Group;
-import com.foxminded.Task7_SQL.service.DBCPDataSource;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
 public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     
@@ -19,7 +19,7 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     public List<Group> getAllData() {
 	List<Group> groups = new ArrayList<>();
 	
-	try(var con = DBCPDataSource.getConnection();
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(GET_ALL_GROUPS);
 	    var resultSet = statement.executeQuery()){
 	    
@@ -40,22 +40,24 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     }
 
     @Override
-    public void save(Group group) {
-	try(var con = DBCPDataSource.getConnection();
+    public Boolean save(Group group) {
+	var groupIsSave = true;
+	
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, group.getName());
-	    statement.executeUpdate();
+	    groupIsSave = statement.executeUpdate() != 1 ? false : true;
 	}
 	catch (Exception e) {
 	    e.getStackTrace();
 	}
+	
+	return groupIsSave;
     }
     
     @Override
     public Integer countStudentInGroupById(Integer groupId) {
-	var id = groupId;
-	
-	try(var con = DBCPDataSource.getConnection();
+	try(var con = ConnectionPoolManager.getConnection();
 	    var statement = con.prepareStatement(COUNT_STUDENT)){
 	    statement.setInt(1, groupId);
 	    
@@ -63,7 +65,7 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
 		if (resultSer.next()) {
 		    return resultSer.getInt("amount");
 		}else {
-		    id = 0;
+		    groupId = 0;
 		}
 	    }
 	} catch (SQLException e) {

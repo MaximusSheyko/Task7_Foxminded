@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import com.foxminded.Task7_SQL.dao.CourseDao;
 import com.foxminded.Task7_SQL.entity.Course;
 
-public class CourseQuery {
-    CourseDao courseDao;
+public class CourseService {
+    private CourseDao courseDao;
     
-    public CourseQuery(CourseDao courseDao) {
+    public CourseService(CourseDao courseDao) {
 	this.courseDao = courseDao;
     }
 

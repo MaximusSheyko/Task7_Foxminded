@@ -5,6 +5,5 @@ import java.util.List;
 
 public abstract class AbstractDao<T> {
     public abstract List<T> getAllData() throws SQLException;
-    public abstract void save(T obj) throws SQLException;
-    
+    public abstract Boolean save(T obj) throws SQLException;
 }
