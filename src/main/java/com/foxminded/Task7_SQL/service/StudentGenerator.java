@@ -22,8 +22,8 @@ public class StudentGenerator implements Generator {
 
     @Override
     public void generate() {
-	List<String> name = reader.read("First_Name_Student.txt");
-	List<String> surname = reader.read("Last_Name_Student.txt");
+	List<String> name = reader.read("firstname_student.txt");
+	List<String> surname = reader.read("lastmame_student.txt");
 	var bound = 0;
 	var random = new Random();
 

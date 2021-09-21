@@ -3,6 +3,8 @@ package com.foxminded.Task7_SQL;
 import com.foxminded.Task7_SQL.dao.CourseDao;
 import com.foxminded.Task7_SQL.dao.GroupDao;
 import com.foxminded.Task7_SQL.dao.StudentDao;
+import com.foxminded.Task7_SQL.service.ConfigDataBase;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.CourseGenerator;
 import com.foxminded.Task7_SQL.service.DataBaseGeneratorRelationship;
 import com.foxminded.Task7_SQL.service.GroupGenerator;
@@ -30,12 +32,14 @@ public class SchoolApplication {
     private StudentService studentService;
     private CourseService courseService;
     private GroupService groupService;
+    private ConnectionPoolManager connectionManager;
     
     private StudentDao studentDao;
     private CourseDao courseDao;
     private GroupDao groupDao;
      
     public SchoolApplication(StudentDao studentDao, CourseDao courseDao, GroupDao groupDao) {
+	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
 	this.studentDao = studentDao;
 	this.courseDao = courseDao;
 	this.groupDao = groupDao;
@@ -47,7 +51,7 @@ public class SchoolApplication {
 	choiceMenu = new MenuChoice(reader, menuQuery);
 	
 	out.println("Welcome, step 1: Run script to create data base!");
-	DataBaseScriptRunner.createDataBase("resources/db_setup.sql");
+	DataBaseScriptRunner.createDataBase("resources/db_setup.sql", connectionManager);
 	
 	out.println("step 2: To generate students");
 	studentGenerator = new StudentGenerator(studentDao, reader);

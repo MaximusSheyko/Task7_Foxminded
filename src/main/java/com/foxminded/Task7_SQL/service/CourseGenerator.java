@@ -19,7 +19,7 @@ public class CourseGenerator implements Generator {
     public void generate() {
 	var spliterator = "_";
 
-	reader.read("Courses.txt").stream().forEach(line -> courseDao
+	reader.read("courses.txt").stream().forEach(line -> courseDao
 		.save(new Course.CourseBuild()
 		.setName(line.split(spliterator)[0])
 		.setDescription(line.split(spliterator)[1])

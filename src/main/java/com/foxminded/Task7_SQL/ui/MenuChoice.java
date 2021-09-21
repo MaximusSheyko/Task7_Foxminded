@@ -17,7 +17,7 @@ public class MenuChoice {
     }
     
     public void showChoice() {
-	reader.read("Options").forEach(System.out::println);
+	reader.read("options").forEach(System.out::println);
     }
 
     public String readChoice(Scanner scanner) {
