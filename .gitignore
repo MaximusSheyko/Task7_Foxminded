@@ -4,4 +4,4 @@
 *.settings
 *.properties
 *.classpath
-!Switch_DB.properties
+!config_db.properties
