@@ -22,14 +22,14 @@ public class StudentGenerator implements Generator {
 
     @Override
     public void generate() {
-	List<String> name = reader.read("firstname_student.txt");
-	List<String> surname = reader.read("lastmame_student.txt");
+	var name = reader.read("firstname_student.txt");
+	var surname = reader.read("lastmame_student.txt");
 	var bound = 0;
 	var random = new Random();
 
 	bound = name.size() - 1;
 
-	for (int i = 1; 200 >= i; i++) {
+	for (var i = 1; 200 >= i; i++) {
 	    try {
 		studentDao.save(new Student
 			.StudentBuild()

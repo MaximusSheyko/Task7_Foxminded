@@ -51,7 +51,7 @@ public class SchoolApplication {
 	choiceMenu = new MenuChoice(reader, menuQuery);
 	
 	out.println("Welcome, step 1: Run script to create data base!");
-	DataBaseScriptRunner.createDataBase("resources/db_setup.sql", connectionManager);
+	DataBaseScriptRunner.createDataBase("db_setup.sql", connectionManager);
 	
 	out.println("step 2: To generate students");
 	studentGenerator = new StudentGenerator(studentDao, reader);
