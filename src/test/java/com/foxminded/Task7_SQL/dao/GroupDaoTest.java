@@ -8,16 +8,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.foxminded.Task7_SQL.entity.Group;
+import com.foxminded.Task7_SQL.service.ConfigDataBase;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class GroupDaoTest {
     private GroupDao groupDao;
-
+    private ConnectionPoolManager connectionManager;
+    
     @BeforeEach
     void setUp() throws Exception {
-	DataBaseScriptRunner.createDataBase("resources/db_setup.sql");
-	DataBaseScriptRunner.createDataBase("src/test/java/Upload_TestBase.sql");
-	groupDao = new GroupDao();
+	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
+	groupDao = new GroupDao(connectionManager);
+	DataBaseTestRunner.run(connectionManager);
     }
 
     @Test

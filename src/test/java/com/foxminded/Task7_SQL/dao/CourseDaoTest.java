@@ -8,18 +8,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.foxminded.Task7_SQL.entity.Course;
+import com.foxminded.Task7_SQL.service.ConfigDataBase;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class CourseDaoTest {
     private CourseDao courseDao;
     private static final String VALID_COURSE_NAME = "Math";
-   
+    private ConnectionPoolManager connectionManager;
 
     @BeforeEach
     void setUp() throws Exception {
-	courseDao = new CourseDao();
-	DataBaseScriptRunner.createDataBase("resources/db_setup.sql");
-	DataBaseScriptRunner.createDataBase("src/test/java/Upload_TestBase.sql");
+	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
+	courseDao = new CourseDao(connectionManager);
+	DataBaseTestRunner.run(connectionManager);
     }
 
     @Test

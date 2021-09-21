@@ -26,12 +26,17 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     private static final String ALL_STUDENTS_ON_COURSE = "SELECT count(student_id)"
     	+ " AS totalStudents"
     	+ " FROM students_courses WHERE course_id = ?;";
+    private ConnectionPoolManager connectionManager;
+    
+    public CourseDao(ConnectionPoolManager connectionManager) {
+	this.connectionManager = connectionManager;
+    }
 
     @Override
     public List<Course> getAllData() {
 	ArrayList<Course> courses = new ArrayList<>();
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(GET_ALL_GROUPS);
 	    var resultSet = statement.executeQuery()){
 	    
@@ -53,7 +58,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     public Boolean save(Course course) {
 	var courseIsSave = true;
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
             var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, course.getName());
 	    statement.setString(2, course.getDescription());
@@ -69,7 +74,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     public List<Integer> getIdStudenstOnCourseByName(String courseName) {
 	List<Integer> idStudents = new ArrayList<>();
 	
-	try(var connection = ConnectionPoolManager.getConnection();
+	try(var connection = connectionManager.getConnection();
 	    var statement = connection.prepareStatement(GET_ID_STUDENTS_ON_GROUP)){
 	    statement.setString(1, courseName);
 	    var resultSet = statement.executeQuery();
@@ -89,7 +94,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     public List<Integer> getAllCoursesIdByStudentId(Integer studentId){
 	List<Integer> coursesId = new ArrayList<>();
 	
-	try(var connection = ConnectionPoolManager.getConnection();
+	try(var connection = connectionManager.getConnection();
 	    var statement = connection.prepareStatement(GET_ALL_COURSES)){
 	    statement.setInt(1, studentId);
 	    
@@ -108,7 +113,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     
     @Override
     public void deleteCourseForStudent(Integer studentId, Integer courseId) {
-	try(var connection = ConnectionPoolManager.getConnection();
+	try(var connection = connectionManager.getConnection();
 	    var statement = connection.prepareStatement(REMOVE_COURSE_FROM_STUDENT)){
 	    	 statement.setInt(1, studentId);
 	    	 statement.setInt(2, courseId);
@@ -122,7 +127,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     public Integer countAllStudentsByStudentID(Integer studentId) {
 	var amountStudents = 0;
 	
-	try(var connection = ConnectionPoolManager.getConnection();
+	try(var connection = connectionManager.getConnection();
 	    var statement = connection.prepareStatement(ALL_STUDENTS_ON_COURSE)){
 	    statement.setInt(1, studentId);
 	  
