@@ -24,12 +24,17 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
 	    + "WHERE student_id = ?";
     private static final String ADD_STUDENT_TO_COURSE = 
 	    "INSERT INTO students_courses VALUES(?, ?)";
+    private ConnectionPoolManager connectionManager;
     
+    public StudentDao(ConnectionPoolManager connectionManager) {
+	this.connectionManager = connectionManager;
+    }
+
     @Override
     public Student getById(int id) {
 	Student student = null;
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(GET_BY_ID)){
 	    statement.setInt(1, id);
 	    try(var resultSet = statement.executeQuery()){
@@ -51,7 +56,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public<Integer> Boolean deleteById(Integer id) {
 	boolean studentIsDeleted = true;
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(REMOVE_BY_ID)){
 	   statement.setInt(1, (int) id);
 	   studentIsDeleted = (statement.executeUpdate() != 1) ? false : true;	
@@ -66,7 +71,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public List<Student> getAllData() {
 	List<Student> students = new ArrayList<>();
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(GET_ALL_STUDENTS);
 	    var resultSet = statement.executeQuery()){
 	    
@@ -89,7 +94,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public Boolean save(Student studant) throws SQLException {
 	var studentIsSave = true;
 	
-	try(Connection con = ConnectionPoolManager.getConnection();
+	try(Connection con = connectionManager.getConnection();
 	    PreparedStatement statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, studant.getFirstName());
 	    statement.setString(2, studant.getLastName());
@@ -110,7 +115,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public boolean update(Student student) throws SQLException {
 	var studentIsUpdate = true;
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(UPDATE_STUDENT)){
 	    statement.setInt(1, student.getGroupID());
 	    statement.setString(2, student.getFirstName());
@@ -126,7 +131,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     public<Integer> Boolean addStudentToCourseById(Integer idStudent, Integer idCourse) {
 	var studentIsAdded = true;
 	
-	try(var connection = ConnectionPoolManager.getConnection();
+	try(var connection = connectionManager.getConnection();
 	    var statement = connection.prepareStatement
 		    (ADD_STUDENT_TO_COURSE);){
 	    statement.setInt(1, (int) idStudent);

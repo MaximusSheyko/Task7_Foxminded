@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.foxminded.Task7_SQL.entity.Student;
+import com.foxminded.Task7_SQL.service.ConfigDataBase;
+import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class StudentDaoTest {
@@ -19,13 +21,13 @@ class StudentDaoTest {
     private Student student;
     private final static int INVALID_ID = 4;
     private final static int VALID_ID = 1;
-
+    private ConnectionPoolManager connectionManager;
     
     @BeforeEach
     void setUp() throws Exception {
-	DataBaseScriptRunner.createDataBase("resources/db_setup.sql");
-	DataBaseScriptRunner.createDataBase("src/test/java/Upload_TestBase.sql");
-	studentDao = new StudentDao();
+	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
+	studentDao = new StudentDao(connectionManager);
+	DataBaseTestRunner.run(connectionManager);
     }
 
     @Test

@@ -14,12 +14,17 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     private static final String GET_ALL_GROUPS = "SELECT * FROM groups";
     private static final String COUNT_STUDENT = "SELECT count(students.group_id) AS amount "
     	+ "FROM students WHERE students.group_id = ?";
+    private ConnectionPoolManager connectionManager;
+    
+    public GroupDao(ConnectionPoolManager connectionManager) {
+	this.connectionManager = connectionManager;
+    }
 
     @Override
     public List<Group> getAllData() {
 	List<Group> groups = new ArrayList<>();
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(GET_ALL_GROUPS);
 	    var resultSet = statement.executeQuery()){
 	    
@@ -43,7 +48,7 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     public Boolean save(Group group) {
 	var groupIsSave = true;
 	
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, group.getName());
 	    groupIsSave = statement.executeUpdate() != 1 ? false : true;
@@ -57,7 +62,7 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     
     @Override
     public Integer countStudentInGroupById(Integer groupId) {
-	try(var con = ConnectionPoolManager.getConnection();
+	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(COUNT_STUDENT)){
 	    statement.setInt(1, groupId);
 	    
