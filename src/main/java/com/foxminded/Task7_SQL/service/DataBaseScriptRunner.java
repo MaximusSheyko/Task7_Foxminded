@@ -8,11 +8,13 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 
 public class DataBaseScriptRunner {
     
-    public static void createDataBase(String pathToScriptSQL) {
-	try(var connection = ConnectionPoolManager.getConnection()){
+    public static void createDataBase(String pathToScriptSQL, ConnectionPoolManager connectionSource) {
+	try(var connection = connectionSource.getConnection()){
 	    var runner = new ScriptRunner(connection);
 	    
-	    try(var file = new FileReader(pathToScriptSQL)){
+	    try(var file = new FileReader(ClassLoader.getSystemClassLoader()
+	    		.getResource(pathToScriptSQL)
+	    		.getFile())){
 		runner.runScript(file);
 	    }
 	}
