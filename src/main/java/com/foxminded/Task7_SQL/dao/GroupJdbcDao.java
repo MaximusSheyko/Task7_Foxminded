@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.foxminded.Task7_SQL.dao.interfaces.GroupQuery;
+import com.foxminded.Task7_SQL.dao.interfaces.GroupDao;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
-public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
+public class GroupJdbcDao implements GenericDao<Group>, GroupDao<Integer>{
     
     private static final String SAVE_TO_TABLE = "INSERT INTO groups VALUES(default, ?)"; 
     private static final String GET_ALL_GROUPS = "SELECT * FROM groups";
@@ -16,7 +16,7 @@ public class GroupDao extends AbstractDao<Group> implements GroupQuery<Integer>{
     	+ "FROM students WHERE students.group_id = ?";
     private ConnectionPoolManager connectionManager;
     
-    public GroupDao(ConnectionPoolManager connectionManager) {
+    public GroupJdbcDao(ConnectionPoolManager connectionManager) {
 	this.connectionManager = connectionManager;
     }
 

@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.foxminded.Task7_SQL.dao.interfaces.CourseQuery;
+import com.foxminded.Task7_SQL.dao.interfaces.CourseDao;
 import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
-public class CourseDao extends AbstractDao<Course> implements CourseQuery<Integer> {
+public class CourseJdbcDao implements GenericDao<Course>, CourseDao<Integer> {
     
     private static final String SAVE_TO_TABLE = "INSERT INTO courses "
     	+ "(coursename, coursedescription)"
@@ -28,7 +28,7 @@ public class CourseDao extends AbstractDao<Course> implements CourseQuery<Intege
     	+ " FROM students_courses WHERE course_id = ?;";
     private ConnectionPoolManager connectionManager;
     
-    public CourseDao(ConnectionPoolManager connectionManager) {
+    public CourseJdbcDao(ConnectionPoolManager connectionManager) {
 	this.connectionManager = connectionManager;
     }
 

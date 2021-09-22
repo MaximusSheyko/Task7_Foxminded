@@ -4,44 +4,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.foxminded.Task7_SQL.dao.CourseDao;
+import com.foxminded.Task7_SQL.dao.CourseJdbcDao;
 import com.foxminded.Task7_SQL.entity.Course;
 
 public class CourseService {
-    private CourseDao courseDao;
+    private CourseJdbcDao courseJdbcDao;
     
-    public CourseService(CourseDao courseDao) {
-	this.courseDao = courseDao;
+    public CourseService(CourseJdbcDao courseJdbcDao) {
+	this.courseJdbcDao = courseJdbcDao;
     }
 
     public List<Course> getAllCourses() {
-	return courseDao.getAllData();
+	return courseJdbcDao.getAllData();
     }
 
     public List<String> getAllCoursesIdByStudentId(Integer studentId) {
-	return courseDao.getAllCoursesIdByStudentId(studentId).stream()
+	return courseJdbcDao.getAllCoursesIdByStudentId(studentId).stream()
 		.map(course -> String.valueOf(course)).toList();
     }
 
     public void unsubscribeStudentFromCourse(Integer studentId, Integer courseId) {
-	courseDao.deleteCourseForStudent(studentId, courseId);
+	courseJdbcDao.deleteCourseForStudent(studentId, courseId);
     }
 
     public Map<Integer, Integer> getCountStudentAllCourses() {
-	List<Integer> coursesId = courseDao.getAllData().stream()
+	List<Integer> coursesId = courseJdbcDao.getAllData().stream()
 		.map(Course::getId).toList();
 	Map<Integer, Integer> coursesIdAndCountStudent = coursesId.stream()
 		.collect(Collectors.toMap(Integer::intValue, 
-			value -> courseDao.countAllStudentsByStudentID(value)));
+			value -> courseJdbcDao.countAllStudentsByStudentID(value)));
 
 	return coursesIdAndCountStudent;
     }
 
     public Map<String, List<Integer>> getAllStudentsOnCourses() {
-	List<Course> courses = courseDao.getAllData();
+	List<Course> courses = courseJdbcDao.getAllData();
 	Map<String, List<Integer>> allStudentsOnCourse = courses.stream().collect(
 		Collectors.toMap(Course::getName, value -> 
-		courseDao.getIdStudenstOnCourseByName(value.getName())));
+		courseJdbcDao.getIdStudenstOnCourseByName(value.getName())));
 
 	return allStudentsOnCourse;
     }

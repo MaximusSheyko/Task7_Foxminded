@@ -13,13 +13,13 @@ import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class GroupDaoTest {
-    private GroupDao groupDao;
+    private GroupJdbcDao groupJdbcDao;
     private ConnectionPoolManager connectionManager;
     
     @BeforeEach
     void setUp() throws Exception {
 	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
-	groupDao = new GroupDao(connectionManager);
+	groupJdbcDao = new GroupJdbcDao(connectionManager);
 	DataBaseTestRunner.run(connectionManager);
     }
 
@@ -38,7 +38,7 @@ class GroupDaoTest {
 		.setName("MV-13")
 		.build());
 	
-	assertEquals(groups, groupDao.getAllData());
+	assertEquals(groups, groupJdbcDao.getAllData());
     }
 
     @Test
@@ -47,13 +47,13 @@ class GroupDaoTest {
 		.setName("Software_Engineering")
 		.build();
 	
-	assertTrue(groupDao.save(group));
+	assertTrue(groupJdbcDao.save(group));
     }
 
     @Test
     void testCountStudentInGroupById() {
 	var amountStudentsOnGroup = 2;
 	
-	assertEquals(amountStudentsOnGroup, groupDao.countStudentInGroupById(1));
+	assertEquals(amountStudentsOnGroup, groupJdbcDao.countStudentInGroupById(1));
     }
 }

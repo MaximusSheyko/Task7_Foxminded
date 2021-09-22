@@ -2,13 +2,13 @@ package com.foxminded.Task7_SQL.service.menuquery;
 
 import java.util.List;
 
-import com.foxminded.Task7_SQL.dao.GroupDao;
+import com.foxminded.Task7_SQL.dao.GroupJdbcDao;
 import com.foxminded.Task7_SQL.entity.Group;
 
 public class GroupService {
-    private GroupDao dao;
+    private GroupJdbcDao dao;
     
-    public GroupService(GroupDao dao) {
+    public GroupService(GroupJdbcDao dao) {
 	this.dao = dao;
     }
 

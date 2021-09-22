@@ -9,28 +9,28 @@ import java.util.Random;
 import java.util.Set;
 
 
-import com.foxminded.Task7_SQL.dao.CourseDao;
-import com.foxminded.Task7_SQL.dao.GroupDao;
-import com.foxminded.Task7_SQL.dao.StudentDao;
+import com.foxminded.Task7_SQL.dao.CourseJdbcDao;
+import com.foxminded.Task7_SQL.dao.GroupJdbcDao;
+import com.foxminded.Task7_SQL.dao.StudentJdbcDao;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.entity.Student;
 
 public class DataBaseGeneratorRelationship {
-    private StudentDao studentDao;
-    private GroupDao groupDao;
-    private CourseDao courseDao;
+    private StudentJdbcDao studentJdbcDao;
+    private GroupJdbcDao groupJdbcDao;
+    private CourseJdbcDao courseJdbcDao;
     
-    public DataBaseGeneratorRelationship(StudentDao studentDao, 
-	    GroupDao groupDao, CourseDao courseDao) {
-	this.studentDao = studentDao;
-	this.groupDao = groupDao;
-	this.courseDao = courseDao;
+    public DataBaseGeneratorRelationship(StudentJdbcDao studentJdbcDao, 
+	    GroupJdbcDao groupJdbcDao, CourseJdbcDao courseJdbcDao) {
+	this.studentJdbcDao = studentJdbcDao;
+	this.groupJdbcDao = groupJdbcDao;
+	this.courseJdbcDao = courseJdbcDao;
     }
     
     public void  assignStudentsToGroups() {
 	var random = new Random();
-	List<Student> students = studentDao.getAllData();
-	List<Group> groups = groupDao.getAllData();
+	List<Student> students = studentJdbcDao.getAllData();
+	List<Group> groups = groupJdbcDao.getAllData();
 	Collections.shuffle(students);
 	var idStudents = students.listIterator();
 	
@@ -47,7 +47,7 @@ public class DataBaseGeneratorRelationship {
 		student.setGroupId(group.getId());
 		
 		try {
-		    studentDao.update(student);
+		    studentJdbcDao.update(student);
 		} catch (SQLException e) {
 		    e.printStackTrace();
 		}
@@ -74,10 +74,10 @@ public class DataBaseGeneratorRelationship {
     }
     
     public void assignCourseEachStudent()  {
-	var  studentsId = studentDao.getAllData().stream()
+	var  studentsId = studentJdbcDao.getAllData().stream()
 		.map(student -> student.getPersonalID())
 		.toList();
-	var coursesId = courseDao.getAllData().stream()
+	var coursesId = courseJdbcDao.getAllData().stream()
 		.map(course -> course.getId())
 		.toList();
 	
@@ -90,11 +90,11 @@ public class DataBaseGeneratorRelationship {
 	Set<Integer> cache = new HashSet<>();
 	int iterations = 1 + random.nextInt(3 - 1 + 1);
 
-	for (int i = 0; i < iterations; i++) {
-	    int idCourse = coursesId.get(random.nextInt(coursesId.size()));
+	for (var i = 0; i < iterations; i++) {
+	    var idCourse = coursesId.get(random.nextInt(coursesId.size()));
 
 	    if (!cache.contains(idCourse)) {
-		studentDao.addStudentToCourseById(studentId, idCourse);
+		studentJdbcDao.addStudentToCourseById(studentId, idCourse);
 		cache.add(idCourse);
 	    }
 	}

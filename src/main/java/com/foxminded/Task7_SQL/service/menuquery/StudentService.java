@@ -3,13 +3,13 @@ package com.foxminded.Task7_SQL.service.menuquery;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.foxminded.Task7_SQL.dao.StudentDao;
+import com.foxminded.Task7_SQL.dao.StudentJdbcDao;
 import com.foxminded.Task7_SQL.entity.Student;
 
 public class StudentService {
-    private StudentDao dao;
+    private StudentJdbcDao dao;
       
-    public StudentService(StudentDao dao) {
+    public StudentService(StudentJdbcDao dao) {
 	this.dao = dao;
     }
 

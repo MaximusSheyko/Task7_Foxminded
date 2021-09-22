@@ -1,8 +1,8 @@
 package com.foxminded.Task7_SQL;
 
-import com.foxminded.Task7_SQL.dao.CourseDao;
-import com.foxminded.Task7_SQL.dao.GroupDao;
-import com.foxminded.Task7_SQL.dao.StudentDao;
+import com.foxminded.Task7_SQL.dao.CourseJdbcDao;
+import com.foxminded.Task7_SQL.dao.GroupJdbcDao;
+import com.foxminded.Task7_SQL.dao.StudentJdbcDao;
 import com.foxminded.Task7_SQL.service.ConfigDataBase;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.CourseGenerator;
@@ -34,18 +34,18 @@ public class SchoolApplication {
     private GroupService groupService;
     private ConnectionPoolManager connectionManager;
     
-    private StudentDao studentDao;
-    private CourseDao courseDao;
-    private GroupDao groupDao;
+    private StudentJdbcDao studentJdbcDao;
+    private CourseJdbcDao courseJdbcDao;
+    private GroupJdbcDao groupJdbcDao;
      
-    public SchoolApplication(StudentDao studentDao, CourseDao courseDao, GroupDao groupDao) {
+    public SchoolApplication(StudentJdbcDao studentJdbcDao, CourseJdbcDao courseJdbcDao, GroupJdbcDao groupJdbcDao) {
 	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
-	this.studentDao = studentDao;
-	this.courseDao = courseDao;
-	this.groupDao = groupDao;
-	courseService = new CourseService(courseDao);
-	studentService = new StudentService(studentDao);
-	groupService = new GroupService(groupDao);
+	this.studentJdbcDao = studentJdbcDao;
+	this.courseJdbcDao = courseJdbcDao;
+	this.groupJdbcDao = groupJdbcDao;
+	courseService = new CourseService(courseJdbcDao);
+	studentService = new StudentService(studentJdbcDao);
+	groupService = new GroupService(groupJdbcDao);
 	reader = new Reader();
 	menuQuery = new MenuQuery(studentService, groupService, courseService);
 	choiceMenu = new MenuChoice(reader, menuQuery);
@@ -54,25 +54,25 @@ public class SchoolApplication {
 	DataBaseScriptRunner.createDataBase("db_setup.sql", connectionManager);
 	
 	out.println("step 2: To generate students");
-	studentGenerator = new StudentGenerator(studentDao, reader);
+	studentGenerator = new StudentGenerator(studentJdbcDao, reader);
 	studentGenerator.generate();
 	
 	out.println("step 3: To generate courses");
-	courseGenerator = new CourseGenerator(courseDao, reader);
+	courseGenerator = new CourseGenerator(courseJdbcDao, reader);
 	courseGenerator.generate();
 	
 	out.println("step 4: To generate groups");
-	groupGenerator = new GroupGenerator(groupDao);
+	groupGenerator = new GroupGenerator(groupJdbcDao);
 	groupGenerator.generate();
 	
 	out.println("step 5: Assign each student to the group");
 	dataBaseGeneratorRelationship = new DataBaseGeneratorRelationship
-		(studentDao, groupDao, courseDao);
+		(studentJdbcDao, groupJdbcDao, courseJdbcDao);
 	dataBaseGeneratorRelationship.assignStudentsToGroups();
 	
 	out.println("step 6: Assign each student to the group" + System.lineSeparator());
 	dataBaseGeneratorRelationship = new DataBaseGeneratorRelationship
-		(studentDao, groupDao, courseDao);
+		(studentJdbcDao, groupJdbcDao, courseJdbcDao);
 	dataBaseGeneratorRelationship.assignCourseEachStudent();
     }
 

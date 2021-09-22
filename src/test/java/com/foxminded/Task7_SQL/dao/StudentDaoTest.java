@@ -17,7 +17,7 @@ import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class StudentDaoTest {
     
-    private StudentDao studentDao;
+    private StudentJdbcDao studentJdbcDao;
     private Student student;
     private final static int INVALID_ID = 4;
     private final static int VALID_ID = 1;
@@ -26,7 +26,7 @@ class StudentDaoTest {
     @BeforeEach
     void setUp() throws Exception {
 	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
-	studentDao = new StudentDao(connectionManager);
+	studentJdbcDao = new StudentJdbcDao(connectionManager);
 	DataBaseTestRunner.run(connectionManager);
     }
 
@@ -37,7 +37,7 @@ class StudentDaoTest {
 		.setPersonalID(1)
 		.build();
 	
-	assertEquals(student, studentDao.getById(1));
+	assertEquals(student, studentJdbcDao.getById(1));
     }
     
     @DisplayName("Get all students")
@@ -59,18 +59,18 @@ class StudentDaoTest {
 		setPersonalID(3)
 		.build());
 	
-	assertFalse(studentDao.getAllData()::isEmpty);
-	assertEquals(students, studentDao.getAllData());
+	assertFalse(studentJdbcDao.getAllData()::isEmpty);
+	assertEquals(students, studentJdbcDao.getAllData());
     }
     
     @Test
     void testDeleteById_whenStudentIdIsValid() {
-	assertTrue(studentDao.deleteById(VALID_ID));
+	assertTrue(studentJdbcDao.deleteById(VALID_ID));
     }
     
     @Test
     void testDeleteById_whenStudentIdIsNoValid() {
-	assertTrue(!studentDao.deleteById(INVALID_ID));
+	assertTrue(!studentJdbcDao.deleteById(INVALID_ID));
     }
 
     @Test
@@ -80,7 +80,7 @@ class StudentDaoTest {
 	.setLastName("Test")
 	.build();
 	
-	assertTrue(studentDao.save(student));
+	assertTrue(studentJdbcDao.save(student));
     }
 
     @Test
@@ -92,7 +92,7 @@ class StudentDaoTest {
 		.setGroupID(VALID_ID)
 		.build();
 	
-	assertTrue(studentDao.update(student));
+	assertTrue(studentJdbcDao.update(student));
     }
     
     @Test
@@ -103,11 +103,11 @@ class StudentDaoTest {
 		.setPersonalID(INVALID_ID)
 		.build();
 	
-	assertTrue(!studentDao.update(student));
+	assertTrue(!studentJdbcDao.update(student));
     }
     
     @Test
     void testAddStudentToCourseById_whenStudentIdAndCourseIdIsValids() {
-	assertTrue(studentDao.addStudentToCourseById(VALID_ID, 2));
+	assertTrue(studentJdbcDao.addStudentToCourseById(VALID_ID, 2));
     }
 }

@@ -13,14 +13,14 @@ import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 import com.foxminded.Task7_SQL.service.DataBaseScriptRunner;
 
 class CourseDaoTest {
-    private CourseDao courseDao;
+    private CourseJdbcDao courseJdbcDao;
     private static final String VALID_COURSE_NAME = "Math";
     private ConnectionPoolManager connectionManager;
 
     @BeforeEach
     void setUp() throws Exception {
 	connectionManager = new ConnectionPoolManager(ConfigDataBase.getConfig());
-	courseDao = new CourseDao(connectionManager);
+	courseJdbcDao = new CourseJdbcDao(connectionManager);
 	DataBaseTestRunner.run(connectionManager);
     }
 
@@ -37,7 +37,7 @@ class CourseDaoTest {
 		.setId(2)
 		.build());
 	
-	assertEquals(courses, courseDao.getAllData());
+	assertEquals(courses, courseJdbcDao.getAllData());
     }
 
     @Test
@@ -47,33 +47,33 @@ class CourseDaoTest {
 		.setDescription("Something about")
 		.build();
 	
-	assertTrue(courseDao.save(course));
+	assertTrue(courseJdbcDao.save(course));
     }
 
     @Test
     void testGetIdStudenstOnCourseByName() {
 	var studentsId = Arrays.asList(1,2);
 	
-	assertEquals(studentsId, courseDao.getIdStudenstOnCourseByName(VALID_COURSE_NAME));
+	assertEquals(studentsId, courseJdbcDao.getIdStudenstOnCourseByName(VALID_COURSE_NAME));
     }
     
     @Test
     void testGetIdStudenstOnCourseByName_whenCourseNameNoFound() {
-  	assertTrue(courseDao.getIdStudenstOnCourseByName("Something")::isEmpty);
+  	assertTrue(courseJdbcDao.getIdStudenstOnCourseByName("Something")::isEmpty);
       }
 
     @Test
     void testGetAllCoursesIdByStudentId() {
 	var coursesId = Arrays.asList(2,1);
 	
-	assertEquals(coursesId, courseDao.getAllCoursesIdByStudentId(1));
+	assertEquals(coursesId, courseJdbcDao.getAllCoursesIdByStudentId(1));
     }
 
     @Test
     void testCountAllStudentsByStudentID() {
 	var countStudents = 2;
 	
-	assertEquals(countStudents, courseDao.countAllStudentsByStudentID(1));
+	assertEquals(countStudents, courseJdbcDao.countAllStudentsByStudentID(1));
     }
     
    @Test
@@ -81,7 +81,7 @@ class CourseDaoTest {
        var studentId = 1;
        var courseID = 1;
      
-       courseDao.deleteCourseForStudent(studentId, courseID);
-       assertEquals(1, courseDao.getAllCoursesIdByStudentId(studentId).size());
+       courseJdbcDao.deleteCourseForStudent(studentId, courseID);
+       assertEquals(1, courseJdbcDao.getAllCoursesIdByStudentId(studentId).size());
     }
 }

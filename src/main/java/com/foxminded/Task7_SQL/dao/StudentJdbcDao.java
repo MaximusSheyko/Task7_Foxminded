@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.foxminded.Task7_SQL.dao.interfaces.StudentQuery;
+import com.foxminded.Task7_SQL.dao.interfaces.StudentDao;
 import com.foxminded.Task7_SQL.entity.Student;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
-public class StudentDao extends AbstractDao<Student> implements StudentQuery{
+public class StudentJdbcDao implements GenericDao<Student>, StudentDao<Integer, Student>{
     
     private static final String GET_BY_ID = "SELECT * FROM students "
     	+ "WHERE student_id = ?";
@@ -26,7 +26,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
 	    "INSERT INTO students_courses VALUES(?, ?)";
     private ConnectionPoolManager connectionManager;
     
-    public StudentDao(ConnectionPoolManager connectionManager) {
+    public StudentJdbcDao(ConnectionPoolManager connectionManager) {
 	this.connectionManager = connectionManager;
     }
 
@@ -53,7 +53,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     }
 
     @Override
-    public<Integer> Boolean deleteById(Integer id) {
+    public Boolean deleteById(Integer id) {
 	boolean studentIsDeleted = true;
 	
 	try(var con = connectionManager.getConnection();
@@ -128,7 +128,7 @@ public class StudentDao extends AbstractDao<Student> implements StudentQuery{
     }
     
     @Override
-    public<Integer> Boolean addStudentToCourseById(Integer idStudent, Integer idCourse) {
+    public Boolean addStudentToCourseById(Integer idStudent, Integer idCourse) {
 	var studentIsAdded = true;
 	
 	try(var connection = connectionManager.getConnection();
