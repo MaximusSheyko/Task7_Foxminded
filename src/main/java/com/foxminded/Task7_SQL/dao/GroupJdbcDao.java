@@ -4,11 +4,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.foxminded.Task7_SQL.dao.interfaces.GenericDao;
 import com.foxminded.Task7_SQL.dao.interfaces.GroupDao;
 import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
-public class GroupJdbcDao implements GenericDao<Group>, GroupDao<Integer>{
+public class GroupJdbcDao implements GroupDao<Integer, Group>{
     
     private static final String SAVE_TO_TABLE = "INSERT INTO groups VALUES(default, ?)"; 
     private static final String GET_ALL_GROUPS = "SELECT * FROM groups";
@@ -37,7 +38,8 @@ public class GroupJdbcDao implements GenericDao<Group>, GroupDao<Integer>{
 	    }
 	    
 	    return groups;
-	}catch (SQLException e) {
+	}
+	catch (SQLException e) {
 	    e.getStackTrace();
 	}
 	
@@ -45,19 +47,15 @@ public class GroupJdbcDao implements GenericDao<Group>, GroupDao<Integer>{
     }
 
     @Override
-    public Boolean save(Group group) {
-	var groupIsSave = true;
-	
+    public void save(Group group) {
 	try(var con = connectionManager.getConnection();
 	    var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, group.getName());
-	    groupIsSave = statement.executeUpdate() != 1 ? false : true;
+	    statement.executeUpdate();
 	}
 	catch (Exception e) {
 	    e.getStackTrace();
 	}
-	
-	return groupIsSave;
     }
     
     @Override
@@ -69,11 +67,13 @@ public class GroupJdbcDao implements GenericDao<Group>, GroupDao<Integer>{
 	    try(var resultSer = statement.executeQuery()){
 		if (resultSer.next()) {
 		    return resultSer.getInt("amount");
-		}else {
+		}
+		else {
 		    groupId = 0;
 		}
 	    }
-	} catch (SQLException e) {
+	}
+	catch (SQLException e) {
 	    e.printStackTrace();
 	}
 	

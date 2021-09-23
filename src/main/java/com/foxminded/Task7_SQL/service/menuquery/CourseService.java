@@ -32,7 +32,7 @@ public class CourseService {
 		.map(Course::getId).toList();
 	Map<Integer, Integer> coursesIdAndCountStudent = coursesId.stream()
 		.collect(Collectors.toMap(Integer::intValue, 
-			value -> courseJdbcDao.countAllStudentsByStudentID(value)));
+			value -> courseJdbcDao.countAllStudentsByCourseID(value)));
 
 	return coursesIdAndCountStudent;
     }

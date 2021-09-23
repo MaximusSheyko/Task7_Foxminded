@@ -3,6 +3,7 @@ package com.foxminded.Task7_SQL.dao;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,9 @@ class CourseDaoTest {
 		.setDescription("Something about")
 		.build();
 	
-	assertTrue(courseJdbcDao.save(course));
+	courseJdbcDao.save(course);
+	assertTrue(courseJdbcDao.getAllData().stream()
+		.anyMatch(e -> e.getName().equals(course.getName())));
     }
 
     @Test
@@ -73,15 +76,20 @@ class CourseDaoTest {
     void testCountAllStudentsByStudentID() {
 	var countStudents = 2;
 	
-	assertEquals(countStudents, courseJdbcDao.countAllStudentsByStudentID(1));
+	assertEquals(countStudents, courseJdbcDao.countAllStudentsByCourseID(1));
     }
     
    @Test
     void testDeleteCourseForStudent() {
        var studentId = 1;
-       var courseID = 1;
-     
-       courseJdbcDao.deleteCourseForStudent(studentId, courseID);
-       assertEquals(1, courseJdbcDao.getAllCoursesIdByStudentId(studentId).size());
+       var courseIdToDelete = 1;
+       var countCoursesBeforeDelete = 2;
+       var countCoursesAfterDelete = 1;
+       
+       assertEquals(countCoursesBeforeDelete, courseJdbcDao
+	       .getAllCoursesIdByStudentId(studentId).size());
+       courseJdbcDao.deleteCourseForStudent(studentId, courseIdToDelete);
+       assertEquals(countCoursesAfterDelete, courseJdbcDao
+	       .getAllCoursesIdByStudentId(studentId).size());
     }
 }

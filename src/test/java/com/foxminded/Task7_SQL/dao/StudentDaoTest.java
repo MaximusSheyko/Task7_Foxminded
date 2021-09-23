@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ class StudentDaoTest {
     private Student student;
     private final static int INVALID_ID = 4;
     private final static int VALID_ID = 1;
+    private final static String TEST_NAME = "Test";
     private ConnectionPoolManager connectionManager;
     
     @BeforeEach
@@ -34,10 +37,11 @@ class StudentDaoTest {
     void testGetById() {
 	student = new Student.StudentBuild().setFirstName("Maxim")
 		.setLastName("Sheyko")
-		.setPersonalID(1)
+		.setPersonalID(VALID_ID)
+		.setGroupID(VALID_ID)
 		.build();
 	
-	assertEquals(student, studentJdbcDao.getById(1));
+	assertEquals(student, studentJdbcDao.getById(VALID_ID));
     }
     
     @DisplayName("Get all students")
@@ -65,49 +69,59 @@ class StudentDaoTest {
     
     @Test
     void testDeleteById_whenStudentIdIsValid() {
-	assertTrue(studentJdbcDao.deleteById(VALID_ID));
+	Predicate<Student> isStudentId = student -> student.getPersonalID() != VALID_ID;
+	
+	studentJdbcDao.deleteById(VALID_ID);
+	assertTrue(isStudentId.test(studentJdbcDao.getById(VALID_ID)));
     }
     
     @Test
-    void testDeleteById_whenStudentIdIsNoValid() {
-	assertTrue(!studentJdbcDao.deleteById(INVALID_ID));
-    }
-
-    @Test
     void testSaveStudent_whenStudentIsSaveValid() throws SQLException {
+	Predicate<Student> isFirstName = student -> student.getFirstName().equals(TEST_NAME);
+	Predicate<Student> isLastName = student -> student.getLastName().equals(TEST_NAME);
 	student = new Student.StudentBuild()
-	.setFirstName("Test")
-	.setLastName("Test")
+	.setFirstName(TEST_NAME)
+	.setLastName(TEST_NAME)
 	.build();
 	
-	assertTrue(studentJdbcDao.save(student));
+	studentJdbcDao.save(student);
+	assertTrue((isFirstName.and(isLastName).test(studentJdbcDao.getById(4))));
     }
 
     @Test
     void testUpdate_whenStudentIsValid() throws SQLException {
 	student = new Student.StudentBuild()
-		.setFirstName("DarkBlood")
-		.setLastName("Kara")
+		.setFirstName(TEST_NAME)
+		.setLastName(TEST_NAME)
 		.setPersonalID(VALID_ID)
 		.setGroupID(VALID_ID)
 		.build();
 	
-	assertTrue(studentJdbcDao.update(student));
+	studentJdbcDao.update(student);
+	assertEquals(student, studentJdbcDao.getById(VALID_ID));
     }
     
     @Test
     void testUpdate_whenStudentIsNoValid() throws SQLException{
+	Predicate<Student> isStudentId = student -> student.getPersonalID() != INVALID_ID;
 	student = new Student.StudentBuild()
 		.setFirstName("TestName")
 		.setLastName("TestName")
 		.setPersonalID(INVALID_ID)
 		.build();
+	studentJdbcDao.update(student);
 	
-	assertTrue(!studentJdbcDao.update(student));
+	assertTrue(isStudentId.test(studentJdbcDao.getById(INVALID_ID)));
     }
     
-    @Test
-    void testAddStudentToCourseById_whenStudentIdAndCourseIdIsValids() {
-	assertTrue(studentJdbcDao.addStudentToCourseById(VALID_ID, 2));
+   @Test
+    void testAddStudentToCourseById() {
+       	var courseJdbcDao = new CourseJdbcDao(connectionManager);
+	var courseId = 2;
+	var studentId = 2;
+	
+       	studentJdbcDao.addStudentToCourseById(studentId, courseId);
+       	assertTrue(courseJdbcDao.getAllCoursesIdByStudentId(studentId).stream()
+       		.anyMatch(id -> id.equals(courseId)));
     }
 }

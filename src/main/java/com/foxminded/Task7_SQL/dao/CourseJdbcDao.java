@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.foxminded.Task7_SQL.dao.interfaces.CourseDao;
+import com.foxminded.Task7_SQL.dao.interfaces.GenericDao;
 import com.foxminded.Task7_SQL.entity.Course;
 import com.foxminded.Task7_SQL.service.ConnectionPoolManager;
 
-public class CourseJdbcDao implements GenericDao<Course>, CourseDao<Integer> {
+public class CourseJdbcDao implements CourseDao<Integer, Course> {
     
     private static final String SAVE_TO_TABLE = "INSERT INTO courses "
-    	+ "(coursename, coursedescription)"
-	    + " VALUES(?, ?)";
+    	+ "(coursename, coursedescription) VALUES(?, ?)";
     private static final String GET_ALL_GROUPS = "SELECT * FROM courses";
     private static final String GET_ID_STUDENTS_ON_GROUP = "SELECT students_courses.student_id"
     	+ " AS id_student FROM students_courses, courses "
@@ -47,27 +47,25 @@ public class CourseJdbcDao implements GenericDao<Course>, CourseDao<Integer> {
 			.setDescription(resultSet.getString(3))
 			.build());
 	    }
-	}catch (SQLException e) {
+	} 
+	catch (SQLException e) {
 	    e.getStackTrace();
 	}
-	
+
 	return courses;
     }
     
     @Override
-    public Boolean save(Course course) {
-	var courseIsSave = true;
-	
+    public void save(Course course) {	
 	try(var con = connectionManager.getConnection();
             var statement = con.prepareStatement(SAVE_TO_TABLE)){
 	    statement.setString(1, course.getName());
 	    statement.setString(2, course.getDescription());
-	    courseIsSave = statement.executeUpdate() !=1 ? false : true;
-	}catch (SQLException e) {
+	    statement.executeUpdate();
+	}
+	catch (SQLException e) {
 	    e.getStackTrace();
 	}
-	
-	return courseIsSave;
     }
     
     @Override
@@ -104,7 +102,8 @@ public class CourseJdbcDao implements GenericDao<Course>, CourseDao<Integer> {
 		    coursesId.add(resultSet.getInt("course_id"));
 		}
 	    }
-	}catch (SQLException e) {
+	}
+	catch (SQLException e) {
 	    e.getStackTrace();
 	}
 	
@@ -118,26 +117,30 @@ public class CourseJdbcDao implements GenericDao<Course>, CourseDao<Integer> {
 	    	 statement.setInt(1, studentId);
 	    	 statement.setInt(2, courseId);
 	    	 statement.executeUpdate();
-	}catch (SQLException e) {
+	}
+	catch (SQLException e) {
 	    e.getStackTrace();
 	}
     }
 
     @Override
-    public Integer countAllStudentsByStudentID(Integer studentId) {
+    public Integer countAllStudentsByCourseID(Integer courseId) {
 	var amountStudents = 0;
 	
 	try(var connection = connectionManager.getConnection();
-	    var statement = connection.prepareStatement(ALL_STUDENTS_ON_COURSE)){
-	    statement.setInt(1, studentId);
-	  
-	    try(var resultSet = statement.executeQuery()){
-		amountStudents = resultSet.next()?resultSet.getInt(1):0;
+		var statement = connection.prepareStatement(ALL_STUDENTS_ON_COURSE)) {
+	    statement.setInt(1, courseId);
+
+	    try (var resultSet = statement.executeQuery()) {
+		if (resultSet.next()) {
+		    amountStudents = resultSet.getInt(1);
 		}
-	    }catch (SQLException e) {
-		e.getStackTrace();
 	    }
-	
+	} 
+	catch (SQLException e) {
+	    e.getStackTrace();
+	}
+
 	return amountStudents;
     }
 }

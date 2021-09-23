@@ -47,7 +47,9 @@ class GroupDaoTest {
 		.setName("Software_Engineering")
 		.build();
 	
-	assertTrue(groupJdbcDao.save(group));
+	groupJdbcDao.save(group);
+	assertTrue(groupJdbcDao.getAllData().stream()
+		.anyMatch(e -> e.getName().equals(group.getName())));
     }
 
     @Test
