@@ -1,5 +1,7 @@
 package com.foxminded.Task7_SQL.service.interfaces;
 
-public interface Generator {
-    public void generate();
+import java.util.List;
+
+public interface Generator<T> {
+    public List<T> generate();
 }

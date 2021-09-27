@@ -1,9 +1,11 @@
 package com.foxminded.Task7_SQL.dao.interfaces;
 
-import java.sql.SQLException;
 import java.util.List;
 
+import com.foxminded.Task7_SQL.dao.DAOException;
+
 public interface GenericDao<T> {
-    public List<T> getAllData() throws SQLException;
-    public void save(T obj) throws SQLException;
+    public List<T> getAllData() throws DAOException;
+
+    public void save(T obj) throws DAOException;
 }

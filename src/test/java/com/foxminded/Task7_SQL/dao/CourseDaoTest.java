@@ -58,12 +58,12 @@ class CourseDaoTest {
     void testGetIdStudenstOnCourseByName() {
 	var studentsId = Arrays.asList(1, 2);
 
-	assertEquals(studentsId, courseJdbcDao.getIdStudenstOnCourseByName(VALID_COURSE_NAME));
+	assertEquals(studentsId, courseJdbcDao.getStudensIdtOnCourseByName(VALID_COURSE_NAME));
     }
 
     @Test
     void testGetIdStudenstOnCourseByName_whenCourseNameNoFound() {
-	assertTrue(courseJdbcDao.getIdStudenstOnCourseByName("Something")::isEmpty);
+	assertTrue(courseJdbcDao.getStudensIdtOnCourseByName("Something")::isEmpty);
     }
 
     @Test
