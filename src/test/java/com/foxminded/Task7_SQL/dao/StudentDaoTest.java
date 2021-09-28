@@ -3,6 +3,7 @@ package com.foxminded.Task7_SQL.dao;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ class StudentDaoTest {
     }
 
     @Test
-    void testGetById() {
+    void testGetById() throws DAOException {
 	student = new Student.StudentBuild().setFirstName("Maxim")
 		.setLastName("Sheyko")
 		.setPersonalID(VALID_ID)
@@ -45,7 +46,7 @@ class StudentDaoTest {
 
     @DisplayName("Get all students")
     @Test
-    void testGetAllData() {
+    void testGetAllData() throws DAOException {
 	var students = Arrays.asList(new Student.StudentBuild()
 		.setFirstName("Maxim")
 		.setLastName("Sheyko")
@@ -61,20 +62,35 @@ class StudentDaoTest {
 			.setLastName("Teilor").setPersonalID(3)
 			.build());
 
-	assertFalse(studentJdbcDao.getAllData()::isEmpty);
 	assertEquals(students, studentJdbcDao.getAllData());
     }
 
     @Test
-    void testDeleteById_whenStudentIdIsValid() {
-	Predicate<Student> isStudentId = student -> student.getPersonalID() != VALID_ID;
+    void testGetAllData_noEmpty() throws DAOException {
+	student = new Student.StudentBuild()
+		.setFirstName(TEST_NAME)
+		.setLastName(TEST_NAME)
+		.setPersonalID(VALID_ID)
+		.build();
 
-	studentJdbcDao.deleteById(VALID_ID);
-	assertTrue(isStudentId.test(studentJdbcDao.getById(VALID_ID)));
+	studentJdbcDao.save(student);
+	assertFalse(studentJdbcDao.getAllData()::isEmpty);
     }
 
     @Test
-    void testSaveStudent_whenStudentIsSaveValid() throws SQLException {
+    void testDeleteById_whenStudentIdIsValid() throws DAOException {
+	studentJdbcDao.deleteById(VALID_ID);
+	assertThrows(DAOException.class, () -> studentJdbcDao.getById(VALID_ID));
+    }
+
+    @Test
+    void testDeleteById_whenStudentIdIsInValid() throws DAOException {
+	studentJdbcDao.deleteById(INVALID_ID);
+	assertThrows(DAOException.class, () -> studentJdbcDao.getById(INVALID_ID));
+    }
+
+    @Test
+    void testSaveStudent_whenStudentIsSaveValid() throws SQLException, DAOException {
 	Predicate<Student> isFirstName = student -> student.getFirstName().equals(TEST_NAME);
 	Predicate<Student> isLastName = student -> student.getLastName().equals(TEST_NAME);
 	student = new Student.StudentBuild()
@@ -87,7 +103,7 @@ class StudentDaoTest {
     }
 
     @Test
-    void testUpdate_whenStudentIsValid() throws SQLException {
+    void testUpdate_whenStudentIsValid() throws DAOException {
 	student = new Student.StudentBuild()
 		.setFirstName(TEST_NAME)
 		.setLastName(TEST_NAME)
@@ -100,20 +116,19 @@ class StudentDaoTest {
     }
 
     @Test
-    void testUpdate_whenStudentIsNoValid() throws SQLException {
-	Predicate<Student> isStudentId = student -> student.getPersonalID() != INVALID_ID;
+    void testUpdate_whenStudentIsNoValid() throws DAOException {
 	student = new Student.StudentBuild()
-		.setFirstName("TestName")
-		.setLastName("TestName")
-		.setPersonalID(INVALID_ID)
+		.setFirstName(TEST_NAME)
+		.setLastName(TEST_NAME)
+		.setPersonalID(VALID_ID)
+		.setGroupID(INVALID_ID)
 		.build();
-	studentJdbcDao.update(student);
 
-	assertTrue(isStudentId.test(studentJdbcDao.getById(INVALID_ID)));
+	assertThrows(DAOException.class, () -> studentJdbcDao.update(student));
     }
 
     @Test
-    void testAddStudentToCourseById() {
+    void testAddStudentToCourseById() throws DAOException {
 	var courseJdbcDao = new CourseJdbcDao(connectionManager);
 	var courseId = 2;
 	var studentId = 2;

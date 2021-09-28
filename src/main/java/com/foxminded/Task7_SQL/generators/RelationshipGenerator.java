@@ -44,7 +44,7 @@ public class RelationshipGenerator {
 	return updatedStudents;
     }
 
-    private <T> int getQuntityStudentsId(ListIterator<T> studentsId) {
+    private int getQuntityStudentsId(ListIterator<Student> studentsId) {
 	var counter = 0;
 
 	while (studentsId.hasNext()) {

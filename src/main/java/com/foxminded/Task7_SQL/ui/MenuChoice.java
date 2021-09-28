@@ -33,7 +33,7 @@ public class MenuChoice {
 
 	switch(input) {
 	    case "a":
-		menuQuery.findAllGroupsWithLessOrEqualsStudentCount(scanner);
+		menuQuery.findAllCoursesWithLessOrEqualsStudentCount(scanner);
 		break;
 	    case "b":
 	    	menuQuery.findStudentsRelatedToCourseName(scanner);

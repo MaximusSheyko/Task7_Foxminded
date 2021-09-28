@@ -2,6 +2,7 @@ package com.foxminded.Task7_SQL.service.menuquery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.foxminded.Task7_SQL.dao.DAOException;
 import com.foxminded.Task7_SQL.dao.StudentJdbcDao;
@@ -83,5 +84,17 @@ public class StudentService {
 		e.printStackTrace();
 	    }
 	});
+    }
+
+    public void subscribeStudentToCourse(Map<Integer, List<Integer>> studentsAndTheirCourses) {
+	var studentsId = studentsAndTheirCourses.keySet();
+	studentsId.forEach(id -> studentsAndTheirCourses.get(id)
+		.forEach(courseId -> {
+		    try {
+			dao.addStudentToCourseById(id, courseId);
+		    } catch (DAOException e) {
+			e.printStackTrace();
+		    }
+		}));
     }
 }

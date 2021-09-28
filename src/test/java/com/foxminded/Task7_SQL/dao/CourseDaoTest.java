@@ -26,7 +26,7 @@ class CourseDaoTest {
     }
 
     @Test
-    void testGetAllData() {
+    void testGetAllData() throws DAOException {
 	var courses = Arrays.asList(new Course.CourseBuild()
 		.setName("Math")
 		.setDescription("Something about the Math")
@@ -42,7 +42,7 @@ class CourseDaoTest {
     }
 
     @Test
-    void testSaveCourse() {
+    void testSaveCourse() throws DAOException {
 	Course course = new Course.CourseBuild()
 		.setName("Test")
 		.setDescription("Something about")
@@ -55,33 +55,33 @@ class CourseDaoTest {
     }
 
     @Test
-    void testGetIdStudenstOnCourseByName() {
+    void testGetIdStudenstOnCourseByName() throws DAOException {
 	var studentsId = Arrays.asList(1, 2);
 
 	assertEquals(studentsId, courseJdbcDao.getStudensIdtOnCourseByName(VALID_COURSE_NAME));
     }
 
     @Test
-    void testGetIdStudenstOnCourseByName_whenCourseNameNoFound() {
-	assertTrue(courseJdbcDao.getStudensIdtOnCourseByName("Something")::isEmpty);
+    void testGetIdStudenstOnCourseByName_whenCourseNameNoFound() throws DAOException {
+	assertTrue(courseJdbcDao.getStudensIdtOnCourseByName("Something").isEmpty());
     }
 
     @Test
-    void testGetAllCoursesIdByStudentId() {
+    void testGetAllCoursesIdByStudentId() throws DAOException {
 	var coursesId = Arrays.asList(1, 2);
 
 	assertEquals(coursesId, courseJdbcDao.getAllCoursesIdByStudentId(1));
     }
 
     @Test
-    void testCountAllStudentsByStudentID() {
+    void testCountAllStudentsByStudentID() throws DAOException {
 	var countStudents = 2;
 
 	assertEquals(countStudents, courseJdbcDao.countAllStudentsByCourseID(1));
     }
 
     @Test
-    void testDeleteCourseForStudent() {
+    void testDeleteCourseForStudent() throws DAOException {
 	var studentId = 1;
 	var courseIdToDelete = 1;
 	var countCoursesBeforeDelete = 2;

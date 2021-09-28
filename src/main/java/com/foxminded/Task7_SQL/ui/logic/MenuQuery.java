@@ -1,5 +1,7 @@
 package com.foxminded.Task7_SQL.ui.logic;
 
+import static java.lang.System.out;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,8 +12,6 @@ import com.foxminded.Task7_SQL.entity.Group;
 import com.foxminded.Task7_SQL.service.menuquery.CourseService;
 import com.foxminded.Task7_SQL.service.menuquery.GroupService;
 import com.foxminded.Task7_SQL.service.menuquery.StudentService;
-
-import static java.lang.System.out;
 
 public class MenuQuery {
     private StudentService studentQuery;
@@ -24,7 +24,7 @@ public class MenuQuery {
 	this.courseQuery = courseQuery;
     }
 
-    public void findAllGroupsWithLessOrEqualsStudentCount(Scanner scanner) {
+    public void findAllCoursesWithLessOrEqualsStudentCount(Scanner scanner) {
 	out.println("Enter count student : ");
 	var input = scanner.nextInt();
 
@@ -142,7 +142,7 @@ public class MenuQuery {
     private List<String> selectCourses(Scanner scanner) {
 	List<String> idCourses = courseQuery.getAllCourses().stream()
 		.map(course -> String.valueOf(course.getId())).toList();
-	List<String> saveIdCourses = new ArrayList<>();
+	var saveIdCourses = new ArrayList<String>();
 	String input;
 
 	do {

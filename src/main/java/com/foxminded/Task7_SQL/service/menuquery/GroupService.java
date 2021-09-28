@@ -25,4 +25,14 @@ public class GroupService {
 
 	return groups;
     }
+
+    public void save(List<Group> groups) {
+	groups.forEach(group -> {
+	    try {
+		dao.save(group);
+	    } catch (DAOException e) {
+		e.printStackTrace();
+	    }
+	});
+    }
 }
