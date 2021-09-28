@@ -4,4 +4,4 @@
 *.settings
 *.properties
 *.classpath
-*.txt
+!config_db.properties
